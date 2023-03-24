@@ -20,13 +20,156 @@ app.post("/Msgpizzacia", async  function (request, response){
     .where("Empresa", "array-contains", EMPRESA)
     .where("Telefone", "==", Mensagem.phone)
     .get().then(async (querySnapshot1) => {
-
+  //O Cliente já está cadastrado 
       if(querySnapshot1.size  !== 0){
+   // Aqui vai pegar os dados da Empresas, Mensgens, e o Tempo Maximo de Chat
+        var MsgEmp = {} 
+        var TempChat
+        await db.collection("EmrpesaSite")
+        .doc(EMPRESA)
+        .get().then(async(doc) => {
+            MsgEmp = doc.data().MsgAuto;
+            TempChat = doc.data().TempoChat;
+        });
    
+
+    
+
+
+   //Pegando o Nome e o Id Do Cliente
+     var NomeCli = "";
+     var IdCli ="";
      await querySnapshot1.forEach((doc1) => {
-         
-          
+         NomeCli =  doc1.data().Nome;
+         IdCli = doc1.id;
         })
+  
+
+    //Montando o horario limite de chat
+    var Horario = new Date().getTime() - (TempChat*3600000);
+
+    //Aqui vamos ver se existe algum chat ja iniciado, pega o id e a fase de mensagem
+      var IdChat = ""
+      var FaMsg = ""
+        await db.collection("ChatCliente")
+        .where("Empresa", "==", EMPRESA)
+        .where("Telefone", "==", Mensagem.phone)
+        .where("Ativo", "==", true)
+        .where("DataInicio", ">=", Horario)
+        .get().then(async (querySnapshot2) => {
+            //Se Existe Um Chat Em Anadamento Entra Aqui 
+            if(querySnapshot2.size  !== 0){
+
+            await querySnapshot2.forEach((doc2) => {
+                IdChat = doc2.id;
+                FaMsg =doc2.data().FaseMsg;
+               })
+            // Existe  um Chat que foi enviado a Mensagem de Apresentação de Pedido de Nome
+               if(FaMsg === "Msg2A" ){
+               //montar a mensagem   
+                var QMsg= MsgEmp.Msg3A.Msg.length;
+                var Sorteio = Math.floor(Math.random() * (QMsg - 1 + 1)) + 1;
+                var Result =parseInt(Sorteio);
+                var Num = Result-1;
+                var AutoMsg = MsgEmp.Msg3A.Msg[Num];
+                var TempMsg =  MsgEmp.Msg3A.TempoSeg;
+
+                 //Aqui vou ta salvando  o Nome do Cliente
+                 await db.collection("ClienteEmpre")
+                 .doc(IdCli)
+                 .update({
+                 Nome: Mensagem.text.message,
+                 })
+                 .then(async() => {
+          
+                 }) 
+
+                 //Mudando a Fase do Chat
+                 await db.collection("ChatCliente")
+                 .doc(IdChat)
+                 .update({
+                 FaseMsg: "Msg3A",
+                 UltimaMsg:{
+                    Autor:IdCli,
+                    body:Mensagem.text.message,
+                    date:Mensagem.momment,
+                    Type:"text"
+                },
+                 Mensagem:admin.firestore.FieldValue.arrayUnion({
+                    Autor:IdCli,
+                    body:Mensagem.text.message,
+                    date:Mensagem.momment,
+                    Type:"text"
+                })
+                 })
+                 .then(async() => {
+          
+                 }) 
+
+                //Aqui vou está enviando uma mensagem
+                setTimeout(() => {
+                    axios.post(`${URL_WHATS}/send-text`, {
+                        "phone": Mensagem.phone,
+                        "message": `${AutoMsg}`,
+                    }).then(function (response) {
+                
+                })
+                
+                }, TempMsg.TempoSeg);
+
+               
+                
+                } 
+            
+            
+            
+            
+            
+            
+            } else {
+
+
+                if(NomeCli === ""){
+
+                 //Aqui vou ta salvando  o Nome do Cliente
+                    await db.collection("ClienteEmpre")
+                    .doc(IdCli)
+                    .update({
+                    Nome: Mensagem.text.message,
+                    })
+                    .then(async() => {
+                      
+                    
+                    
+                    }) 
+        
+                //Aqui vou está enviando uma mensagem
+                    setTimeout(() => {
+                        axios.post(`${URL_WHATS}/send-text`, {
+                            "phone": Mensagem.phone,
+                            "message": `${AutoMsg}`,
+                        }).then(function (response) {
+                       
+                    })
+                       
+                      }, MsgEmp.TempoSeg);
+                   
+                   
+                }
+            
+            
+            
+            
+            }
+
+
+
+
+        })
+
+
+      
+
 
 
 
@@ -97,7 +240,7 @@ app.post("/Msgpizzacia", async  function (request, response){
                 VizualCli:1,
                 DigiEmp:false,
                 DigiCli:false,
-                FaseMsg:"Msg1",
+                FaseMsg:"Msg2A",
                 UltimaMsg:{
                     Autor:IdClient,
                     body:Mensagem.text.message,
