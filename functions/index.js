@@ -91,6 +91,7 @@ var NomeWhats = "";
               var SessaoEsta = "";
               var MemoriaSabores = 0;
               var SaboresEsco = 0;
+            
               await db.collection("ChatCliente")
                 .where("Empresa", "==", EMPRESA)
                 .where("Id", "==", IdCli)
@@ -184,6 +185,7 @@ var NomeWhats = "";
                          await db.collection("ChatCliente")
                          .doc(IdChat)
                          .update({
+                         NomeCliente:Mensagem.body,
                          FaseMsg: "Msg3A",
                          MsgFutura1:{
                             Ativo:true,
@@ -240,7 +242,7 @@ var NomeWhats = "";
 
                      
                         
-                        } else if(FaMsg === "Msg3A" ){//Recebendo o que Deseja realizar, Perguntando Qual Sessão
+                        } else if(FaMsg === "Msg3A" ){//Recebendo o que Deseja realizar Um Pedido, Perguntando Qual Sessão
                               var NumIni = parseInt(Mensagem.body)
                             // Mensagem  que escolheu fazer o pedido
                             if(Mensagem.body === "1" || Mensagem.body === " 1" || Mensagem.body === "1 " || Mensagem.body === " 1 "){
@@ -249,7 +251,6 @@ var NomeWhats = "";
                                 await db.collection("MenusSite")
                                 .where("Empresa", "==", EMPRESA)
                                 .where("Ativo", "==", true)
-                                .where("MemFim", "==", false)
                                 .get().then(async (querySnapshot23) => {
                                     await querySnapshot23.forEach((doc23) => {
 
@@ -314,8 +315,11 @@ var NomeWhats = "";
                             var SortLet = Math.floor(Math.random() * (Letras.length - 1 + 1)) + 1;
                             var NumAr=SortLet-1
                             await db.collection("MesaItem").add({
+                                NomeCli:NomeCli,
+                                TelCli:TelefonCli,
                                 Ativo:true,
                                 Cliente:IdCli,
+                                IdChat:IdChat,
                                 Empresa:EMPRESA,
                                 Codigo: Letras[NumAr]+new Date().getTime(),
                                 Mesa:"Externo",
@@ -330,6 +334,19 @@ var NomeWhats = "";
                                 ConcluidoEntregado:false,
                                 ConcluidoProducao:false,
                                 ConfirmacaoPedido:false,
+                                FormaDepagamento:null,
+                                ExtratoPix:null,
+                                End:{
+                                    Bairro:"",
+                                    Rua:"",
+                                    Numero:"",
+                                    Próximo:"",
+                                    Localizacao:{
+                                        lat:null,
+                                        lng:null,
+                                    }
+                                    },
+                                TelEntregador:"",
                             
                                 }).then(async (dif) => {
                                     // Aqui ta entrando pos não esta no modo rocbo e ele não digitou errado
@@ -1043,7 +1060,7 @@ var NomeWhats = "";
                                                         Preco: MemoriaSessao[NumIni].GrupTamanho[i].PrecoReal,
                                                         QuantSb:MemoriaSessao[NumIni].GrupTamanho[i].Qsabor,
                                                         body: MemoriaSessao[NumIni].GrupTamanho[i].DescontReal?MemoriaSessao[NumIni].GrupTamanho[i].Tamanho+"\n"+"❤️ De: "+"~"+MemoriaSessao[NumIni].GrupTamanho[i].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"~"+" Por "+MemoriaSessao[NumIni].GrupTamanho[i].DescontReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n"  :    MemoriaSessao[NumIni].GrupTamanho[i].Tamanho+"\n"+"💰 "+MemoriaSessao[NumIni].GrupTamanho[i].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n" ,
-                                                       
+                                                        MemFim:MemoriaSessao[NumIni].MemFim,
                                                     })
 
                                                 
@@ -1621,7 +1638,6 @@ var NomeWhats = "";
                                         await db.collection("MenusSite")
                                         .where("Empresa", "==", EMPRESA)
                                         .where("Ativo", "==", true)
-                                        .where("MemFim", "==", false)
                                         .get().then(async (querySnapshot23) => {
                                             await querySnapshot23.forEach((doc23) => {
         
@@ -2266,7 +2282,7 @@ var NomeWhats = "";
                      
                                   
                                      
-                                     }else if(FaMsg === "Msg4D" ){//Recebendo A Quantidade, Peguntando Se Quer Retirar um Ingrediente
+                                     }else if(FaMsg === "Msg4D" ){//Recebendo A Quantidade, Peguntando Se Quer Retirar um Ingrediente OU Mostra nota e Pergunta o que Deseja Fazer
                                         var NumIni = parseInt(Mensagem.body)  
                                         var QuantMen = MemoriaSessao.length;
                                         console.log("Entrada "+NumIni)
@@ -2467,74 +2483,77 @@ var NomeWhats = "";
                                           
                                             } else  if(NumIni > 0 && NumIni <= MemoriaPedido.QuantGeral) {
                                             
-                                             
-                    
-                                                      //montar a mensagem   
-                                                 var QMsg= MsgEmp.Msg4E.Msg.length;
-                                                 var Sorteio = Math.floor(Math.random() * (QMsg - 1 + 1)) + 1;
-                                                 var Result =parseInt(Sorteio);
-                                                 var Num = Result-1;
-                                                 var AutoMsg = MsgEmp.Msg4E.Msg[Num];
-                                                 var TempMsg =  MsgEmp.Msg4E.TempoSeg;
-                                          
-                                                //  console.log(MsgEmp.Msg4B.Msg)
-                                                //  console.log("Qmsg: "+QMsg)       
-                                                //  console.log("Soteio: "+Sorteio)                 
-                                                //  console.log("Msg: "+AutoMsg)
-        
-                                                  
-                             
-                               
-                                                //  var QMsg2= MsgEmp.Msg4D.Msg.length;
-                                                //  var Sorteio2 = Math.floor(Math.random() * (QMsg2 - 1 + 1)) + 1;
-                                                //  var Result2 =parseInt(Sorteio2);
-                                                //  var Num2 = Result2-1;
-                                                //  var AutoMsg2 = MsgEmp.Msg4D.Msg[Num2];
-                                                //  var TempMsg2 =  MsgEmp.Msg4D.TempoSeg;
-                             
-                                                //  console.log(MsgEmp.Msg3A.Msg)
-                                                //  console.log("Qmsg: "+QMsg2)       
-                                                //  console.log("Soteio: "+Sorteio2)                 
-                                                //  console.log("Msg: "+AutoMsg2)
-                                                
+                                             if(MemoriaPedido.MemFim){
+                                            
+                                                //Escolhendo os itens da sessão escolhida
+                                                var Menus = MemoriaPedido;
+                                                var PedidosItens = []
+                                              
+                                                console.log(Menus)
+                
+                
+                                                  //montar a mensagem   
+                                             var QMsg= MsgEmp.Msg4G.Msg.length;
+                                             var Sorteio = Math.floor(Math.random() * (QMsg - 1 + 1)) + 1;
+                                             var Result =parseInt(Sorteio);
+                                             var Num = Result-1;
+                                             var AutoMsg = MsgEmp.Msg4G.Msg[Num];
+                                             var TempMsg =  MsgEmp.Msg4G.TempoSeg;
+                                      
+                                             console.log(MsgEmp.Msg4B.Msg)
+                                             console.log("Qmsg: "+QMsg)       
+                                             console.log("Soteio: "+Sorteio)                 
+                                             console.log("Msg: "+AutoMsg)
     
-                                                   //Mensagem parabenizando que ele acertou a digitação 
-                                                   var QMsg9= MsgEmp.Msg16B.Msg.length;
-                                                   var Sorteio9 = Math.floor(Math.random() * (QMsg9 - 1 + 1)) + 1;
-                                                   var Result9 =parseInt(Sorteio9);
-                                                   var Num9 = Result9-1;
-                                                   var AutoMsg9 = MsgEmp.Msg16B.Msg[Num9];
-                                                   var TempMsg9 =  MsgEmp.Msg16B.TempoSeg;
-        
-                                                  //Mensagens de estimulo 
-                                                  var QMsg3= MsgEmp.Msg17A.Msg.length;
-                                                  var QMsg4= MsgEmp.Msg17B.Msg.length;
-                                                  var QMsg5= MsgEmp.Msg17C.Msg.length;
-                                                  var Sorteio3 = Math.floor(Math.random() * (QMsg3 - 1 + 1)) + 1;
-                                                  var Sorteio4 = Math.floor(Math.random() * (QMsg4 - 1 + 1)) + 1;
-                                                  var Sorteio5 = Math.floor(Math.random() * (QMsg5 - 1 + 1)) + 1;
-                                      
-                                                  var Result3 =parseInt(Sorteio3);
-                                                  var Result4 =parseInt(Sorteio4);
-                                                  var Result5 =parseInt(Sorteio5);
-                                      
-                                                  var Num3 = Result3-1;
-                                                  var Num4 = Result4-1;
-                                                  var Num5 = Result5-1;
-                                                  var AutoMsg3 = MsgEmp.Msg17A.Msg[Num3];
-                                                  var AutoMsg4= MsgEmp.Msg17B.Msg[Num4];
-                                                  var AutoMsg5= MsgEmp.Msg17C.Msg[Num5];
-                                                  var Tempo3 = MsgEmp.Msg17A.TempoSeg + new Date().getTime();
-                                                  var Tempo4 = MsgEmp.Msg17B.TempoSeg + new Date().getTime();
-                                                  var Tempo5 = MsgEmp.Msg17C.TempoSeg + new Date().getTime();
-                            
-                                                  if(Robo === true && EstaNaRegra === true){
-                                                  //Mudando a Fase do Chat
-                                                  await db.collection("ChatCliente")
-                                                  .doc(IdChat)
-                                                  .update({
-                                                  FaseMsg: "Msg4E",
-                                                  MemPedido:{
+                                                 //Mensagem parabenizando que ele acertou a digitação 
+                                            var QMsg9= MsgEmp.Msg16B.Msg.length;
+                                            var Sorteio9 = Math.floor(Math.random() * (QMsg9 - 1 + 1)) + 1;
+                                            var Result9 =parseInt(Sorteio9);
+                                            var Num9 = Result9-1;
+                                            var AutoMsg9 = MsgEmp.Msg16B.Msg[Num9];
+                                            var TempMsg9 =  MsgEmp.Msg16B.TempoSeg;
+                         
+                           
+                                             var QMsg2= MsgEmp.Msg6A.Msg.length;
+                                             var Sorteio2 = Math.floor(Math.random() * (QMsg2 - 1 + 1)) + 1;
+                                             var Result2 =parseInt(Sorteio2);
+                                             var Num2 = Result2-1;
+                                             var AutoMsg2 = MsgEmp.Msg6A.Msg[Num2];
+                                             var TempMsg2 =  MsgEmp.Msg6A.TempoSeg;
+                         
+                                            //  console.log(MsgEmp.Msg3A.Msg)
+                                            //  console.log("Qmsg: "+QMsg2)       
+                                            //  console.log("Soteio: "+Sorteio2)                 
+                                            //  console.log("Msg: "+AutoMsg2)
+                                            
+    
+                                              //Mensagens de estimulo 
+                                              var QMsg3= MsgEmp.Msg17A.Msg.length;
+                                              var QMsg4= MsgEmp.Msg17B.Msg.length;
+                                              var QMsg5= MsgEmp.Msg17C.Msg.length;
+                                              var Sorteio3 = Math.floor(Math.random() * (QMsg3 - 1 + 1)) + 1;
+                                              var Sorteio4 = Math.floor(Math.random() * (QMsg4 - 1 + 1)) + 1;
+                                              var Sorteio5 = Math.floor(Math.random() * (QMsg5 - 1 + 1)) + 1;
+                                  
+                                              var Result3 =parseInt(Sorteio3);
+                                              var Result4 =parseInt(Sorteio4);
+                                              var Result5 =parseInt(Sorteio5);
+                                  
+                                              var Num3 = Result3-1;
+                                              var Num4 = Result4-1;
+                                              var Num5 = Result5-1;
+                                              var AutoMsg3 = MsgEmp.Msg17A.Msg[Num3];
+                                              var AutoMsg4= MsgEmp.Msg17B.Msg[Num4];
+                                              var AutoMsg5= MsgEmp.Msg17C.Msg[Num5];
+                                              var Tempo3 = MsgEmp.Msg17A.TempoSeg + new Date().getTime();
+                                              var Tempo4 = MsgEmp.Msg17B.TempoSeg + new Date().getTime();
+                                              var Tempo5 = MsgEmp.Msg17C.TempoSeg + new Date().getTime();
+                                             console.log("id : "+PedidoCri)
+
+                                              await db.collection("MesaItem")
+                                              .doc(PedidoCri)
+                                              .update({
+                                                Itens:admin.firestore.FieldValue.arrayUnion({
                                                     Nome:MemoriaPedido.Nome,
                                                     Descricao:MemoriaPedido.Descricao,
                                                     Foto:MemoriaPedido.Foto,
@@ -2546,179 +2565,504 @@ var NomeWhats = "";
                                                     Sessao:MemoriaPedido.Sessao,
                                                     SubSessao:MemoriaPedido.SubSessao,
                                                     
-                                                },
-                                                  DigiteNaRegra:true,
-                                                  Robotizado:true, 
-                                                  MsgFutura1:{
-                                                      Ativo:true,
-                                                      Msg:AutoMsg3,
-                                                      Tempo:Tempo3,
-                                                  },
-                                                  MsgFutura2:{
-                                                      Ativo:true,
-                                                      Msg:AutoMsg4,
-                                                      Tempo:Tempo4,
-                                                  },
-                                                  MsgFutura3:{
-                                                      Ativo:true,
-                                                      Msg:AutoMsg5,
-                                                      Tempo:Tempo5,
-                                                  },
-                                                  UltimaMsg:{
-                                                     Autor:EMPRESA,
-                                                     body:`${NomeCli}${AutoMsg}`,
-                                                     date:new Date().getTime()+5000,
-                                                     Type:"Botao"
-                                                 },
-                                                  Mensagem:admin.firestore.FieldValue.arrayUnion(
-                                                    {
-                                                     Autor:IdCli,
-                                                     body:Mensagem.body,
-                                                     date:new Date().getTime(),
-                                                     Type:"text"
-                                                 },
-                                                 {
-                                                     Autor:EMPRESA,
-                                                     body:`${NomeCli}, Sua quantidade foi preenchida no item ${MemoriaPedido.Nome}`,
-                                                     Botao:[],
-                                                     date:new Date().getTime()+3000,
-                                                     Type:"text"
-                                                 },
-                                                 {
-                                                    Autor:EMPRESA,
-                                                    body:`${NomeCli}${AutoMsg}`,
-                                                    Botao:MsgEmp.Msg4E.Botao,
-                                                    date:new Date().getTime()+5000,
-                                                    Type:"Botao"
-                                                },
+                                                }) 
+                                              }).then((doc)=>{
+                                                //PedidosItens = doc.data().Itens;
+                                              })
+
+                                              await db.collection("MesaItem")
+                                              .doc(PedidoCri)
+                                              .get().then((doc)=>{
+                                                PedidosItens = doc.data().Itens;
+                                              })
+                                              console.log(PedidosItens)
+                        
+                                              if(Robo === true && EstaNaRegra === true){
+                                              //Mudando a Fase do Chat
+                                              await db.collection("ChatCliente")
+                                              .doc(IdChat)
+                                              .update({
+                                                MemSessao:[],
+                                                MemPedido:[],
+                                                MemProdutos:[],
+                                                MemSubSessao:[],
+                                                MenSabor:0,
+                                                EscolhaSabor:0, 
+                                                Sessao:"",
+                                              FaseMsg: "Msg6A",
+                                              DigiteNaRegra:true,
+                                              Robotizado:true, 
+                                              MsgFutura1:{
+                                                  Ativo:true,
+                                                  Msg:AutoMsg3,
+                                                  Tempo:Tempo3,
+                                              },
+                                              MsgFutura2:{
+                                                  Ativo:true,
+                                                  Msg:AutoMsg4,
+                                                  Tempo:Tempo4,
+                                              },
+                                              MsgFutura3:{
+                                                  Ativo:true,
+                                                  Msg:AutoMsg5,
+                                                  Tempo:Tempo5,
+                                              },
+                                              UltimaMsg:{
+                                                 Autor:EMPRESA,
+                                                 body:`${NomeCli}${AutoMsg2}`,
+                                                 date:new Date().getTime()+5000,
+                                                 Type:"botao"
+                                             },
+                                              Mensagem:admin.firestore.FieldValue.arrayUnion({
+                                                 Autor:IdCli,
+                                                 body:Mensagem.body,
+                                                 date:new Date().getTime(),
+                                                 Type:"text"
+                                             },
+                                            
+                                             {
+                                                 Autor:EMPRESA,
+                                                 body:`${NomeCli}${AutoMsg}`,
+                                                 date:new Date().getTime()+7000,
+                                                 Type:"text"
+                                             },
+                                             {
+                                                Autor:EMPRESA,
+                                                body:`${NomeCli}${AutoMsg2}`,
+                                                Botao:MsgEmp.Msg6A.Botao,
+                                                date:new Date().getTime()+8000,
+                                                Type:"botao"
+                                            },
+                                             
+                                             
+                                             )
+                                              })
+                                              .then(async() => {
                                                  
-                                                 
-                                                 )
-                                                  })
-                                                  .then(async() => {
-                                                    var MsgPedido = NomeCli+", a Quantidade foi Escolhida e adicionada no pedido";
-                                                     MsgPedido = MsgPedido + "\n===================\n"
-                                                     MsgPedido = MsgPedido + "🛍️ "+MemoriaPedido.Sessao+"\n"
-                                                     MsgPedido = MsgPedido + "📦"+MemoriaPedido.Nome+"\n"
-                                                     if(MemoriaPedido.Descricao){
-                                                        MsgPedido = MsgPedido + "📝"+MemoriaPedido.Descricao+"\n"
-                                                     }
-                                                     if(MemoriaPedido.ItemEspeci){
-                                                        MsgPedido = MsgPedido + "🏷️"+MemoriaPedido.SubSessao+"\n"
-                                                     }
+                                                var MsgPedido = NomeCli+", "+ AutoMsg;
+                                                var TotalValor = 0
+                                                for(let i in PedidosItens){
                                                     
-                                                     if(MemoriaPedido.Descont){
-                                                        MsgPedido = MsgPedido + "💰 De:"+MemoriaPedido.Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                        MsgPedido = MsgPedido + "❤️ Por:"+MemoriaPedido.Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                        MsgPedido = MsgPedido + "🗳️ Quantidade: "+Mensagem.body
-                                                     } else {
-                                                        MsgPedido = MsgPedido + "💰"+MemoriaPedido.Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                        MsgPedido = MsgPedido + "🗳️ Quantidade: "+Mensagem.body
-                                                     }
-                                                        
-                                                      
-                                                        
-                                                     
-                                                   
-                                                    // MemoriaSessao[NumIni].Descricao ?  MemoriaSessao[NumIni].DescontReal?MemoriaSessao[NumIni].nome+"\n"+"📝"+MemoriaSessao[NumIni].Descricao+"\n"+"❤️ De: "+"~"+MemoriaSessao[NumIni].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"~"+" Por "+MemoriaSessao[NumIni].DescontReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n"  :   MemoriaSessao[NumIni].nome+"\n"+"📝"+MemoriaSessao[NumIni].Descricao+"\n"+"💰 "+MemoriaSessao[NumIni].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n":MemoriaSessao[NumIni].DescontReal?MemoriaSessao[NumIni].nome+"\n"+"❤️ De: "+"~"+MemoriaSessao[NumIni].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"~"+" Por "+MemoriaSessao[NumIni].DescontReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n"  :    MemoriaSessao[NumIni].nome+"\n"+"💰 "+MemoriaSessao[NumIni].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n" ,
-                                                   
-                                                     response.json({ Inf:[{Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg}*` , Botao:MsgEmp.Msg4E.Botao , Tempo:TempMsg, Type:"butao"}] });
-                                                  }) 
-                                                } else {
-                                                      //Mudando a Fase do Chat
-                                                  await db.collection("ChatCliente")
-                                                  .doc(IdChat)
-                                                  .update({
-                                                    FaseMsg: "Msg4E",
-                                                    MemPedido:{
-                                                    Nome:MemoriaPedido.Nome,
-                                                    Descricao:MemoriaPedido.Descricao,
-                                                    Foto:MemoriaPedido.Foto,
-                                                    Preco:MemoriaPedido.Preco,
-                                                    Descont:MemoriaPedido.Descont,
-                                                    Quant:NumIni,
-                                                    Observacao:"",
-                                                    ItemEspeci:MemoriaPedido.ItemEspeci,
-                                                    Sessao:MemoriaPedido.Sessao,
-                                                    SubSessao:MemoriaPedido.SubSessao,
-                                                },
-                                                  DigiteNaRegra:true,
-                                                  Robotizado:true, 
-                                                  MsgFutura1:{
-                                                      Ativo:true,
-                                                      Msg:AutoMsg3,
-                                                      Tempo:Tempo3,
-                                                  },
-                                                  MsgFutura2:{
-                                                      Ativo:true,
-                                                      Msg:AutoMsg4,
-                                                      Tempo:Tempo4,
-                                                  },
-                                                  MsgFutura3:{
-                                                      Ativo:true,
-                                                      Msg:AutoMsg5,
-                                                      Tempo:Tempo5,
-                                                  },
-                                                  UltimaMsg:{
-                                                     Autor:EMPRESA,
-                                                     body:`${NomeCli} ${AutoMsg}`,
-                                                     date:new Date().getTime()+5000,
-                                                     Type:"Botao"
-                                                 },
-                                                  Mensagem:admin.firestore.FieldValue.arrayUnion({
-                                                     Autor:IdCli,
-                                                     body:Mensagem.body,
-                                                     date:new Date().getTime(),
-                                                     Type:"text"
-                                                 },
-                                                 {
-                                                    Autor:EMPRESA,
-                                                    body:`${NomeCli}, Quantidade adicionada no item: ${MemoriaPedido.Nome}`,
-                                                    Botao:[],
-                                                    date:new Date().getTime()+3000,
-                                                    Type:"text"
-                                                },
-                                                {
-                                                   Autor:EMPRESA,
-                                                   body:`${NomeCli} ${AutoMsg}`,
-                                                   Botao:MsgEmp.Msg4E.Botao,
-                                                   date:new Date().getTime()+5000,
-                                                   Type:"Botao"
-                                               },
-                                                 
-                                                 
-                                                 )
-                                                  })
-                                                  .then(async() => {
-                                                    var MsgPedido = NomeCli+", a Quantidade foi Escolhida e adicionada no pedido";
+                                                
                                                     MsgPedido = MsgPedido + "\n===================\n"
-                                                    MsgPedido = MsgPedido + "🛍️ "+MemoriaPedido.Sessao+"\n"
-                                                    MsgPedido = MsgPedido + "📦"+MemoriaPedido.Nome+"\n"
-                                                    if(MemoriaPedido.Descricao){
-                                                        MsgPedido = MsgPedido + "📝"+MemoriaPedido.Descricao+"\n"
-                                                     }
-                                                    if(MemoriaPedido.ItemEspeci){
-                                                        MsgPedido = MsgPedido + "🏷️"+MemoriaPedido.SubSessao+"\n"
+                                                    MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
+                                                    
+                                                        MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
+                                                        if(PedidosItens[i].Descricao.length === 1 && PedidosItens[i].Descricao[0] === ""){
+                                                            
+                                                         } else {
+                                                            MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                         }
+                                                   
+                                                    if(PedidosItens[i].ItemEspeci){
+                                                        MsgPedido = MsgPedido + "🏷️"+PedidosItens[i].SubSessao+"\n"
                                                      }
                                                    
-                                                    if(MemoriaPedido.Descont){
-                                                       MsgPedido = MsgPedido + "💰 De:"+MemoriaPedido.Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                       MsgPedido = MsgPedido + "❤️ Por:"+MemoriaPedido.Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+Mensagem.body
+                                                    if(PedidosItens[i].Descont){
+                                                        TotalValor = TotalValor + (PedidosItens[i].Descont*PedidosItens[i].Quant)
+                                                       MsgPedido = MsgPedido + "💰 De:"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                       MsgPedido = MsgPedido + "❤️ Por:"+PedidosItens[i].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                       if(PedidosItens[i].Observacao){
+                                                        MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                       }
                                                     } else {
-                                                       MsgPedido = MsgPedido + "💰"+MemoriaPedido.Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+Mensagem.body
+                                                        TotalValor = TotalValor + (PedidosItens[i].Preco*PedidosItens[i].Quant)
+                                                       MsgPedido = MsgPedido + "💰"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                       if(PedidosItens[i].Observacao){
+                                                        MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                       }
                                                     }
-                                                       
-                                                     
-                                                     
-                                                     //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
-                                                     console.log(TempMsg)
-                                                     response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg}*` , Botao:MsgEmp.Msg4E.Botao , Tempo:TempMsg, Type:"butao"}] });
-                                                   
-                                                    }) 
-        
+
                                                 }
+                                                MsgPedido = MsgPedido + "\n===================\n"
+                                                MsgPedido = MsgPedido + "Total : "+TotalValor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+                                             
+                                                   
+                                                 
+                                              
+                                                response.json({ Inf:[{Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg2}*` , Botao:MsgEmp.Msg6A.Botao , Tempo:TempMsg2, Type:"butao"}] });
+                                              }) 
+                                            } else {
+                                                  //Mudando a Fase do Chat
+                                              await db.collection("ChatCliente")
+                                              .doc(IdChat)
+                                              .update({
+                                                MemSessao:[],
+                                                MemPedido:[],
+                                                MemProdutos:[],
+                                                MemSubSessao:[],
+                                                MenSabor:0,
+                                                EscolhaSabor:0, 
+                                              FaseMsg: "Msg6A",
+                                              DigiteNaRegra:true,
+                                              Robotizado:true, 
+                                              MsgFutura1:{
+                                                  Ativo:true,
+                                                  Msg:AutoMsg3,
+                                                  Tempo:Tempo3,
+                                              },
+                                              MsgFutura2:{
+                                                  Ativo:true,
+                                                  Msg:AutoMsg4,
+                                                  Tempo:Tempo4,
+                                              },
+                                              MsgFutura3:{
+                                                  Ativo:true,
+                                                  Msg:AutoMsg5,
+                                                  Tempo:Tempo5,
+                                              },
+                                              UltimaMsg:{
+                                                 Autor:EMPRESA,
+                                                 body:`${NomeCli}${AutoMsg}`,
+                                                 date:new Date().getTime()+5000,
+                                                 Type:"butao"
+                                             },
+                                              Mensagem:admin.firestore.FieldValue.arrayUnion({
+                                                 Autor:IdCli,
+                                                 body:Mensagem.body,
+                                                 date:new Date().getTime(),
+                                                 Type:"text"
+                                             },
+                                             {
+                                                Autor:EMPRESA,
+                                                body:`${NomeCli}${AutoMsg9}`,
+                                                Botao:Menus,
+                                                date:new Date().getTime()+2000,
+                                                Type:"text"
+                                            },
+                                             {
+                                                 Autor:EMPRESA,
+                                                 body:`${NomeCli}${AutoMsg}`,
+                                                 Botao:Menus,
+                                                 date:new Date().getTime()+5000,
+                                                 Type:"butao"
+                                             },
+                                             {
+                                                Autor:EMPRESA,
+                                                body:`${NomeCli}${AutoMsg2}`,
+                                                Botao:MsgEmp.Msg6A.Botao,
+                                                date:new Date().getTime()+8000,
+                                                Type:"botao"
+                                            },
+                                             
+                                             
+                                             )
+                                              })
+                                              .then(async() => {
+                                                var MsgPedido = NomeCli+", "+ AutoMsg;
+                                                var TotalValor = 0
+                                                for(let i in PedidosItens){
+                                                    
+                                                
+                                                    MsgPedido = MsgPedido + "\n===================\n"
+                                                    MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
+                                                    
+                                                        MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
+                                                        if(PedidosItens[i].Descricao.length === 1 && PedidosItens[i].Descricao[0] === ""){
+                                                            
+                                                        } else {
+                                                           MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                        }
+                                                    
+                                                    if(PedidosItens[i].ItemEspeci){
+                                                        MsgPedido = MsgPedido + "🏷️"+PedidosItens[i].SubSessao+"\n"
+                                                     }
+                                                  
+                                                    if(PedidosItens[i].Descont){
+                                                        TotalValor = TotalValor + (PedidosItens[i].Descont*PedidosItens[i].Quant)
+                                                       MsgPedido = MsgPedido + "💰 De:"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                       MsgPedido = MsgPedido + "❤️ Por:"+PedidosItens[i].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                       if(PedidosItens[i].Observacao){
+                                                        MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                       }
+                                                    } else {
+                                                        TotalValor = TotalValor + (PedidosItens[i].Preco*PedidosItens[i].Quant)
+                                                       MsgPedido = MsgPedido + "💰"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                       if(PedidosItens[i].Observacao){
+                                                        MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                       }
+                                                    }
+
+                                                }
+                                                MsgPedido = MsgPedido + "\n===================\n"
+                                                MsgPedido = MsgPedido + "Total : "+TotalValor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+                                                   
+                                                 
+                                              
+                                                response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg2}*` , Botao:MsgEmp.Msg6A.Botao , Tempo:TempMsg2, Type:"butao"}] });
+                                                 
+                                                 //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
+                                                
+                                               
+                                              }) 
+    
+                                            
+                
+                                        }
+                                            
+                                      
+                                        
+                                            
+                                          
+                                            } else {
+                                                       //montar a mensagem   
+                                                       var QMsg= MsgEmp.Msg4E.Msg.length;
+                                                       var Sorteio = Math.floor(Math.random() * (QMsg - 1 + 1)) + 1;
+                                                       var Result =parseInt(Sorteio);
+                                                       var Num = Result-1;
+                                                       var AutoMsg = MsgEmp.Msg4E.Msg[Num];
+                                                       var TempMsg =  MsgEmp.Msg4E.TempoSeg;
+                                                
+                                                      //  console.log(MsgEmp.Msg4B.Msg)
+                                                      //  console.log("Qmsg: "+QMsg)       
+                                                      //  console.log("Soteio: "+Sorteio)                 
+                                                      //  console.log("Msg: "+AutoMsg)
+              
+                                                        
+                                   
+                                     
+                                                      //  var QMsg2= MsgEmp.Msg4D.Msg.length;
+                                                      //  var Sorteio2 = Math.floor(Math.random() * (QMsg2 - 1 + 1)) + 1;
+                                                      //  var Result2 =parseInt(Sorteio2);
+                                                      //  var Num2 = Result2-1;
+                                                      //  var AutoMsg2 = MsgEmp.Msg4D.Msg[Num2];
+                                                      //  var TempMsg2 =  MsgEmp.Msg4D.TempoSeg;
+                                   
+                                                      //  console.log(MsgEmp.Msg3A.Msg)
+                                                      //  console.log("Qmsg: "+QMsg2)       
+                                                      //  console.log("Soteio: "+Sorteio2)                 
+                                                      //  console.log("Msg: "+AutoMsg2)
+                                                      
+          
+                                                         //Mensagem parabenizando que ele acertou a digitação 
+                                                         var QMsg9= MsgEmp.Msg16B.Msg.length;
+                                                         var Sorteio9 = Math.floor(Math.random() * (QMsg9 - 1 + 1)) + 1;
+                                                         var Result9 =parseInt(Sorteio9);
+                                                         var Num9 = Result9-1;
+                                                         var AutoMsg9 = MsgEmp.Msg16B.Msg[Num9];
+                                                         var TempMsg9 =  MsgEmp.Msg16B.TempoSeg;
+              
+                                                        //Mensagens de estimulo 
+                                                        var QMsg3= MsgEmp.Msg17A.Msg.length;
+                                                        var QMsg4= MsgEmp.Msg17B.Msg.length;
+                                                        var QMsg5= MsgEmp.Msg17C.Msg.length;
+                                                        var Sorteio3 = Math.floor(Math.random() * (QMsg3 - 1 + 1)) + 1;
+                                                        var Sorteio4 = Math.floor(Math.random() * (QMsg4 - 1 + 1)) + 1;
+                                                        var Sorteio5 = Math.floor(Math.random() * (QMsg5 - 1 + 1)) + 1;
+                                            
+                                                        var Result3 =parseInt(Sorteio3);
+                                                        var Result4 =parseInt(Sorteio4);
+                                                        var Result5 =parseInt(Sorteio5);
+                                            
+                                                        var Num3 = Result3-1;
+                                                        var Num4 = Result4-1;
+                                                        var Num5 = Result5-1;
+                                                        var AutoMsg3 = MsgEmp.Msg17A.Msg[Num3];
+                                                        var AutoMsg4= MsgEmp.Msg17B.Msg[Num4];
+                                                        var AutoMsg5= MsgEmp.Msg17C.Msg[Num5];
+                                                        var Tempo3 = MsgEmp.Msg17A.TempoSeg + new Date().getTime();
+                                                        var Tempo4 = MsgEmp.Msg17B.TempoSeg + new Date().getTime();
+                                                        var Tempo5 = MsgEmp.Msg17C.TempoSeg + new Date().getTime();
+                                  
+                                                        if(Robo === true && EstaNaRegra === true){
+                                                        //Mudando a Fase do Chat
+                                                        await db.collection("ChatCliente")
+                                                        .doc(IdChat)
+                                                        .update({
+                                                        FaseMsg: "Msg4E",
+                                                        MemPedido:{
+                                                          Nome:MemoriaPedido.Nome,
+                                                          Descricao:MemoriaPedido.Descricao,
+                                                          Foto:MemoriaPedido.Foto,
+                                                          Preco:MemoriaPedido.Preco,
+                                                          Descont:MemoriaPedido.Descont,
+                                                          Quant:NumIni,
+                                                          Observacao:"",
+                                                          ItemEspeci:MemoriaPedido.ItemEspeci,
+                                                          Sessao:MemoriaPedido.Sessao,
+                                                          SubSessao:MemoriaPedido.SubSessao,
+                                                          
+                                                      },
+                                                        DigiteNaRegra:true,
+                                                        Robotizado:true, 
+                                                        MsgFutura1:{
+                                                            Ativo:true,
+                                                            Msg:AutoMsg3,
+                                                            Tempo:Tempo3,
+                                                        },
+                                                        MsgFutura2:{
+                                                            Ativo:true,
+                                                            Msg:AutoMsg4,
+                                                            Tempo:Tempo4,
+                                                        },
+                                                        MsgFutura3:{
+                                                            Ativo:true,
+                                                            Msg:AutoMsg5,
+                                                            Tempo:Tempo5,
+                                                        },
+                                                        UltimaMsg:{
+                                                           Autor:EMPRESA,
+                                                           body:`${NomeCli}${AutoMsg}`,
+                                                           date:new Date().getTime()+5000,
+                                                           Type:"Botao"
+                                                       },
+                                                        Mensagem:admin.firestore.FieldValue.arrayUnion(
+                                                          {
+                                                           Autor:IdCli,
+                                                           body:Mensagem.body,
+                                                           date:new Date().getTime(),
+                                                           Type:"text"
+                                                       },
+                                                       {
+                                                           Autor:EMPRESA,
+                                                           body:`${NomeCli}, Sua quantidade foi preenchida no item ${MemoriaPedido.Nome}`,
+                                                           Botao:[],
+                                                           date:new Date().getTime()+3000,
+                                                           Type:"text"
+                                                       },
+                                                       {
+                                                          Autor:EMPRESA,
+                                                          body:`${NomeCli}${AutoMsg}`,
+                                                          Botao:MsgEmp.Msg4E.Botao,
+                                                          date:new Date().getTime()+5000,
+                                                          Type:"Botao"
+                                                      },
+                                                       
+                                                       
+                                                       )
+                                                        })
+                                                        .then(async() => {
+                                                          var MsgPedido = NomeCli+", a Quantidade foi Escolhida e adicionada no pedido";
+                                                           MsgPedido = MsgPedido + "\n===================\n"
+                                                           MsgPedido = MsgPedido + "🛍️ "+MemoriaPedido.Sessao+"\n"
+                                                           MsgPedido = MsgPedido + "📦"+MemoriaPedido.Nome+"\n"
+                                                           if(MemoriaPedido.Descricao){
+                                                              MsgPedido = MsgPedido + "📝"+MemoriaPedido.Descricao+"\n"
+                                                           }
+                                                           if(MemoriaPedido.ItemEspeci){
+                                                              MsgPedido = MsgPedido + "🏷️"+MemoriaPedido.SubSessao+"\n"
+                                                           }
+                                                          
+                                                           if(MemoriaPedido.Descont){
+                                                              MsgPedido = MsgPedido + "💰 De:"+MemoriaPedido.Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                              MsgPedido = MsgPedido + "❤️ Por:"+MemoriaPedido.Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                              MsgPedido = MsgPedido + "🗳️ Quantidade: "+Mensagem.body
+                                                           } else {
+                                                              MsgPedido = MsgPedido + "💰"+MemoriaPedido.Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                              MsgPedido = MsgPedido + "🗳️ Quantidade: "+Mensagem.body
+                                                           }
+                                                              
+                                                            
+                                                              
+                                                           
+                                                         
+                                                          // MemoriaSessao[NumIni].Descricao ?  MemoriaSessao[NumIni].DescontReal?MemoriaSessao[NumIni].nome+"\n"+"📝"+MemoriaSessao[NumIni].Descricao+"\n"+"❤️ De: "+"~"+MemoriaSessao[NumIni].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"~"+" Por "+MemoriaSessao[NumIni].DescontReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n"  :   MemoriaSessao[NumIni].nome+"\n"+"📝"+MemoriaSessao[NumIni].Descricao+"\n"+"💰 "+MemoriaSessao[NumIni].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n":MemoriaSessao[NumIni].DescontReal?MemoriaSessao[NumIni].nome+"\n"+"❤️ De: "+"~"+MemoriaSessao[NumIni].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"~"+" Por "+MemoriaSessao[NumIni].DescontReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n"  :    MemoriaSessao[NumIni].nome+"\n"+"💰 "+MemoriaSessao[NumIni].PrecoReal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n" ,
+                                                         
+                                                           response.json({ Inf:[{Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg}*` , Botao:MsgEmp.Msg4E.Botao , Tempo:TempMsg, Type:"butao"}] });
+                                                        }) 
+                                                      } else {
+                                                            //Mudando a Fase do Chat
+                                                        await db.collection("ChatCliente")
+                                                        .doc(IdChat)
+                                                        .update({
+                                                          FaseMsg: "Msg4E",
+                                                          MemPedido:{
+                                                          Nome:MemoriaPedido.Nome,
+                                                          Descricao:MemoriaPedido.Descricao,
+                                                          Foto:MemoriaPedido.Foto,
+                                                          Preco:MemoriaPedido.Preco,
+                                                          Descont:MemoriaPedido.Descont,
+                                                          Quant:NumIni,
+                                                          Observacao:"",
+                                                          ItemEspeci:MemoriaPedido.ItemEspeci,
+                                                          Sessao:MemoriaPedido.Sessao,
+                                                          SubSessao:MemoriaPedido.SubSessao,
+                                                      },
+                                                        DigiteNaRegra:true,
+                                                        Robotizado:true, 
+                                                        MsgFutura1:{
+                                                            Ativo:true,
+                                                            Msg:AutoMsg3,
+                                                            Tempo:Tempo3,
+                                                        },
+                                                        MsgFutura2:{
+                                                            Ativo:true,
+                                                            Msg:AutoMsg4,
+                                                            Tempo:Tempo4,
+                                                        },
+                                                        MsgFutura3:{
+                                                            Ativo:true,
+                                                            Msg:AutoMsg5,
+                                                            Tempo:Tempo5,
+                                                        },
+                                                        UltimaMsg:{
+                                                           Autor:EMPRESA,
+                                                           body:`${NomeCli} ${AutoMsg}`,
+                                                           date:new Date().getTime()+5000,
+                                                           Type:"Botao"
+                                                       },
+                                                        Mensagem:admin.firestore.FieldValue.arrayUnion({
+                                                           Autor:IdCli,
+                                                           body:Mensagem.body,
+                                                           date:new Date().getTime(),
+                                                           Type:"text"
+                                                       },
+                                                       {
+                                                          Autor:EMPRESA,
+                                                          body:`${NomeCli}, Quantidade adicionada no item: ${MemoriaPedido.Nome}`,
+                                                          Botao:[],
+                                                          date:new Date().getTime()+3000,
+                                                          Type:"text"
+                                                      },
+                                                      {
+                                                         Autor:EMPRESA,
+                                                         body:`${NomeCli} ${AutoMsg}`,
+                                                         Botao:MsgEmp.Msg4E.Botao,
+                                                         date:new Date().getTime()+5000,
+                                                         Type:"Botao"
+                                                     },
+                                                       
+                                                       
+                                                       )
+                                                        })
+                                                        .then(async() => {
+                                                          var MsgPedido = NomeCli+", a Quantidade foi Escolhida e adicionada no pedido";
+                                                          MsgPedido = MsgPedido + "\n===================\n"
+                                                          MsgPedido = MsgPedido + "🛍️ "+MemoriaPedido.Sessao+"\n"
+                                                          MsgPedido = MsgPedido + "📦"+MemoriaPedido.Nome+"\n"
+                                                          if(MemoriaPedido.Descricao){
+                                                              MsgPedido = MsgPedido + "📝"+MemoriaPedido.Descricao+"\n"
+                                                           }
+                                                          if(MemoriaPedido.ItemEspeci){
+                                                              MsgPedido = MsgPedido + "🏷️"+MemoriaPedido.SubSessao+"\n"
+                                                           }
+                                                         
+                                                          if(MemoriaPedido.Descont){
+                                                             MsgPedido = MsgPedido + "💰 De:"+MemoriaPedido.Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                             MsgPedido = MsgPedido + "❤️ Por:"+MemoriaPedido.Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                             MsgPedido = MsgPedido + "🗳️ Quantidade: "+Mensagem.body
+                                                          } else {
+                                                             MsgPedido = MsgPedido + "💰"+MemoriaPedido.Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                             MsgPedido = MsgPedido + "🗳️ Quantidade: "+Mensagem.body
+                                                          }
+                                                             
+                                                           
+                                                           
+                                                           //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
+                                                           console.log(TempMsg)
+                                                           response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg}*` , Botao:MsgEmp.Msg4E.Botao , Tempo:TempMsg, Type:"butao"}] });
+                                                         
+                                                          }) 
+              
+                                                      }
+
+                                             }
+                    
+                                               
                     
                     
                                                 
@@ -3027,7 +3371,9 @@ var NomeWhats = "";
                                                         MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
                                                         
                                                             MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
-                                                            if(PedidosItens[i].Descricao){
+                                                            if(PedidosItens[i].Descricao.length === 1 && PedidosItens[i].Descricao[0] === ""){
+                                                                
+                                                             } else {
                                                                 MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
                                                              }
                                                        
@@ -3137,9 +3483,11 @@ var NomeWhats = "";
                                                         MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
                                                         
                                                             MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
-                                                            if(PedidosItens[i].Descricao){
-                                                                MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
-                                                             }
+                                                            if(PedidosItens[i].Descricao.length === 1 && PedidosItens[i].Descricao[0] === ""){
+                                                                
+                                                            } else {
+                                                               MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                            }
                                                         
                                                         if(PedidosItens[i].ItemEspeci){
                                                             MsgPedido = MsgPedido + "🏷️"+PedidosItens[i].SubSessao+"\n"
@@ -3678,9 +4026,12 @@ var NomeWhats = "";
                                                             MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
                                                             
                                                                 MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
-                                                                if(PedidosItens[i].Descricao){
-                                                                    MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
-                                                                 }
+
+                                                                if(PedidosItens[i].Descricao.length === 1 && PedidosItens[i].Descricao[0] === ""){
+                                                                
+                                                                } else {
+                                                                   MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                                }
                                                             
 
 
@@ -3788,9 +4139,11 @@ var NomeWhats = "";
                                                             MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
                                                          
                                                                 MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
-                                                                if(PedidosItens[i].Descricao){
-                                                                    MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
-                                                                 }
+                                                               if(PedidosItens[i].Descricao.length === 1 && PedidosItens[i].Descricao[0] === ""){
+                                                                
+                                                             } else {
+                                                                MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                             }
                                                             
                                                             if(PedidosItens[i].ItemEspeci){
                                                                 MsgPedido = MsgPedido + "🏷️"+PedidosItens[i].SubSessao+"\n"
@@ -3845,21 +4198,21 @@ var NomeWhats = "";
                                                       if(Mensagem.body === "0" || Mensagem.body === " 0" || Mensagem.body === "0 " || Mensagem.body === " 0 "){
                                                     
                                                             //Escolhendo os itens da sessão escolhida
-                                                            var Menus = MemoriaPedido;
+                                                            var Menus = [{id:0, body:"Voltar \n===================\n"}];
                                                             var PedidosItens = []
                                                           
                                                             console.log(Menus)
                             
                             
                                                               //montar a mensagem   
-                                                         var QMsg= MsgEmp.Msg4G.Msg.length;
+                                                         var QMsg= MsgEmp.Msg5A.Msg.length;
                                                          var Sorteio = Math.floor(Math.random() * (QMsg - 1 + 1)) + 1;
                                                          var Result =parseInt(Sorteio);
                                                          var Num = Result-1;
-                                                         var AutoMsg = MsgEmp.Msg4G.Msg[Num];
-                                                         var TempMsg =  MsgEmp.Msg4G.TempoSeg;
+                                                         var AutoMsg = MsgEmp.Msg5A.Msg[Num];
+                                                         var TempMsg =  MsgEmp.Msg5A.TempoSeg;
                                                   
-                                                         console.log(MsgEmp.Msg4B.Msg)
+                                                         console.log(MsgEmp.Msg5A.Msg)
                                                          console.log("Qmsg: "+QMsg)       
                                                          console.log("Soteio: "+Sorteio)                 
                                                          console.log("Msg: "+AutoMsg)
@@ -3909,32 +4262,65 @@ var NomeWhats = "";
                                                           var Tempo5 = MsgEmp.Msg17C.TempoSeg + new Date().getTime();
                                                          console.log("id : "+PedidoCri)
         
-                                                          await db.collection("MesaItem")
-                                                          .doc(PedidoCri)
-                                                          .update({
-                                                            Itens:admin.firestore.FieldValue.arrayUnion(MemoriaPedido) 
-                                                          }).then((doc)=>{
-                                                            //PedidosItens = doc.data().Itens;
-                                                          })
+                                                          
         
                                                           await db.collection("MesaItem")
                                                           .doc(PedidoCri)
                                                           .get().then((doc)=>{
+                                                            
                                                             PedidosItens = doc.data().Itens;
                                                           })
                                                           console.log(PedidosItens)
+
+                                                          
+                                                          for(let i in PedidosItens){
+                                                            var MsgPedido = "";     
+                                                          
+                                                            
+                                                              MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
+                                                              
+                                                                  MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
+                                                                  if(PedidosItens[i].Descricao){
+                                                                      MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                                   }
+                                                             
+                                                              if(PedidosItens[i].ItemEspeci){
+                                                                  MsgPedido = MsgPedido + "🏷️"+PedidosItens[i].SubSessao+"\n"
+                                                               }
+                                                             
+                                                              if(PedidosItens[i].Descont){
+                                                                 
+                                                                 MsgPedido = MsgPedido + "💰 De:"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                 MsgPedido = MsgPedido + "❤️ Por:"+PedidosItens[i].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                 MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                 if(PedidosItens[i].Observacao){
+                                                                  MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                 }
+                                                              } else {
+                                                              
+                                                                 MsgPedido = MsgPedido + "💰"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                 MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                 if(PedidosItens[i].Observacao){
+                                                                  MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                 }
+                                                              }
+                                                              MsgPedido = MsgPedido + "\n===================\n"
+                                                              Menus.push(
+                                                                {
+                                                                    id:i,
+                                                                    body:MsgPedido
+                                                                }
+                                                                )
+      
+                                                          }
                                     
                                                           if(Robo === true && EstaNaRegra === true){
                                                           //Mudando a Fase do Chat
                                                           await db.collection("ChatCliente")
                                                           .doc(IdChat)
                                                           .update({
-                                                            MemSessao:[],
-                                                            MemPedido:[],
-                                                            MemProdutos:[],
-                                                            MemSubSessao:[],
-                                                            Sessao:"",
-                                                          FaseMsg: "Msg6A",
+                                                          MemPedido: PedidosItens,
+                                                          FaseMsg: "Msg5A",
                                                           DigiteNaRegra:true,
                                                           Robotizado:true, 
                                                           MsgFutura1:{
@@ -3954,7 +4340,7 @@ var NomeWhats = "";
                                                           },
                                                           UltimaMsg:{
                                                              Autor:EMPRESA,
-                                                             body:`${NomeCli}${AutoMsg2}`,
+                                                             body:`${NomeCli}${AutoMsg}`,
                                                              date:new Date().getTime()+5000,
                                                              Type:"botao"
                                                          },
@@ -3966,15 +4352,9 @@ var NomeWhats = "";
                                                          },
                                                         
                                                          {
-                                                             Autor:EMPRESA,
-                                                             body:`${NomeCli}${AutoMsg}`,
-                                                             date:new Date().getTime()+7000,
-                                                             Type:"text"
-                                                         },
-                                                         {
                                                             Autor:EMPRESA,
-                                                            body:`${NomeCli}${AutoMsg2}`,
-                                                            Botao:MsgEmp.Msg6A.Botao,
+                                                            body:`${NomeCli}${AutoMsg}`,
+                                                            Botao:Menus,
                                                             date:new Date().getTime()+8000,
                                                             Type:"botao"
                                                         },
@@ -3984,47 +4364,20 @@ var NomeWhats = "";
                                                           })
                                                           .then(async() => {
                                                              
-                                                            var MsgPedido = NomeCli+", "+ AutoMsg;
-                                                            var TotalValor = 0
-                                                            for(let i in PedidosItens){
-                                                                
-                                                            
-                                                                MsgPedido = MsgPedido + "\n===================\n"
-                                                                MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
-                                                                if(PedidosItens[i].Descricao){
-                                                                   MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
-                                                                }
-                                                                if(PedidosItens[i].Descont){
-                                                                    TotalValor = TotalValor + (PedidosItens[i].Descont*PedidosItens[i].Quant)
-                                                                   MsgPedido = MsgPedido + "💰 De:"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                                   MsgPedido = MsgPedido + "❤️ Por:"+PedidosItens[i].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                                   MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant
-                                                                } else {
-                                                                    TotalValor = TotalValor + (PedidosItens[i].Preco*PedidosItens[i].Quant)
-                                                                   MsgPedido = MsgPedido + "💰"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                                   MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant
-                                                                }
-        
-                                                            }
-                                                            MsgPedido = MsgPedido + "\n===================\n"
-                                                            MsgPedido = MsgPedido + "Total : "+TotalValor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+                                                          
                                                          
                                                                
                                                              
                                                           
-                                                            response.json({ Inf:[{Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg2}*` , Botao:MsgEmp.Msg6A.Botao , Tempo:TempMsg2, Type:"butao"}] });
+                                                            response.json({ Inf:[ {Msg: `*${NomeCli}${AutoMsg}*` , Botao:Menus, Tempo:TempMsg, Type:"butao"}] });
                                                           }) 
                                                         } else {
                                                               //Mudando a Fase do Chat
                                                           await db.collection("ChatCliente")
                                                           .doc(IdChat)
                                                           .update({
-                                                            MemSessao:[],
-                                                            MemPedido:[],
-                                                            MemProdutos:[],
-                                                            MemSubSessao:[],
-                                                            Sessao:"",
-                                                          FaseMsg: "Msg6A",
+                                                            MemPedido:PedidosItens,
+                                                            FaseMsg: "Msg5A",
                                                           DigiteNaRegra:true,
                                                           Robotizado:true, 
                                                           MsgFutura1:{
@@ -4068,46 +4421,17 @@ var NomeWhats = "";
                                                              date:new Date().getTime()+5000,
                                                              Type:"butao"
                                                          },
-                                                         {
-                                                            Autor:EMPRESA,
-                                                            body:`${NomeCli}${AutoMsg2}`,
-                                                            Botao:MsgEmp.Msg6A.Botao,
-                                                            date:new Date().getTime()+8000,
-                                                            Type:"botao"
-                                                        },
+                                                         
                                                          
                                                          
                                                          )
                                                           })
                                                           .then(async() => {
-                                                            var MsgPedido = NomeCli+", "+ AutoMsg;
-                                                            var TotalValor = 0
-                                                            for(let i in PedidosItens){
-                                                                
-                                                            
-                                                                MsgPedido = MsgPedido + "\n===================\n"
-                                                                MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
-                                                                if(PedidosItens[i].Descricao){
-                                                                   MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
-                                                                }
-                                                                if(PedidosItens[i].Descont){
-                                                                    TotalValor = TotalValor + (PedidosItens[i].Descont*PedidosItens[i].Quant)
-                                                                   MsgPedido = MsgPedido + "💰 De:"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                                   MsgPedido = MsgPedido + "❤️ Por:"+PedidosItens[i].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                                   MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant
-                                                                } else {
-                                                                    TotalValor = TotalValor + (PedidosItens[i].Preco*PedidosItens[i].Quant)
-                                                                   MsgPedido = MsgPedido + "💰"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
-                                                                   MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant
-                                                                }
-        
-                                                            }
-                                                            MsgPedido = MsgPedido + "\n===================\n"
-                                                            MsgPedido = MsgPedido + "Total : "+TotalValor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+                                                          
                                                                
                                                              
                                                           
-                                                            response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg2}*` , Botao:MsgEmp.Msg6A.Botao , Tempo:TempMsg2, Type:"butao"}] });
+                                                            response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg}*` , Botao:Menus , Tempo:TempMsg, Type:"butao"}] });
                                                              
                                                              //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
                                                             
@@ -4128,7 +4452,6 @@ var NomeWhats = "";
                                                             await db.collection("MenusSite")
                                                             .where("Empresa", "==", EMPRESA)
                                                             .where("Ativo", "==", true)
-                                                            .where("MemFim", "==", false)
                                                             .get().then(async (querySnapshot23) => {
                                                                 await querySnapshot23.forEach((doc23) => {
                             
@@ -4476,7 +4799,6 @@ var NomeWhats = "";
                                                             await db.collection("MenusSite")
                                                             .where("Empresa", "==", EMPRESA)
                                                             .where("Ativo", "==", true)
-                                                            .where("MemFim", "==", false)
                                                             .get().then(async (querySnapshot23) => {
                                                                 await querySnapshot23.forEach((doc23) => {
                             
@@ -4676,7 +4998,7 @@ var NomeWhats = "";
                                                                                 console.log(MemoriaSubSessao[NumIni].Nome)
                                                                                     //Escolhendo os itens da sessão escolhida
                                                                                     var Menus = []
-                                                                                    var Sabor = [{id:"0", body:"Voltar para Tamanho"}]
+                                                                                    var Sabor = [{id:"0", body:"Voltar para Sessões"}]
                                                                                     for(var i = 0; i < MemoriaSubSessao[NumIni].QuantSb; i++){
                                                                                       Sabor.push({
                                                                                         id:i+1,
@@ -4709,6 +5031,7 @@ var NomeWhats = "";
                                                                                                     Observacao: "",
                                                                                                     body:doc23.data().Descricao ?  MemoriaSubSessao[NumIni].Descont?doc23.data().nome+"\n"+"📝"+doc23.data().Descricao+"\n"+"❤️ De: "+"~"+MemoriaSubSessao[NumIni].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"~"+" Por "+MemoriaSubSessao[NumIni].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n"  :    doc23.data().nome+"\n"+"📝"+doc23.data().Descricao+"\n"+"💰 "+MemoriaSubSessao[NumIni].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n":MemoriaSubSessao[NumIni].Descont?doc23.data().nome+"\n"+"❤️ De: "+"~"+MemoriaSubSessao[NumIni].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"~"+" Por "+MemoriaSubSessao[NumIni].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n"  :    doc23.data().nome+"\n"+"💰 "+MemoriaSubSessao[NumIni].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"+"===================\n" ,
                                                                                                     ItemEspeci:true,
+                                                                                                    MemFim:MemoriaSubSessao[NumIni].MemFim,
                                                                                                 })
                     
                                                                                             }
@@ -4855,7 +5178,7 @@ var NomeWhats = "";
                                                                                             
                                                                                             //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
                                                                                             console.log(TempMsg)
-                                                                                            response.json({ Inf:[{Msg: `*${NomeCli}, Você Escolheu ${MemoriaSubSessao[NumIni].Nome}, Nesse Tamanho Você Tem direito de Escolher Até ${MemoriaSubSessao[NumIni].QuantSb} Sabores*`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, ${AutoMsg}*` , Botao:Sabor , Tempo:TempMsg, Type:"butao"}] });
+                                                                                            response.json({ Inf:[{Msg: `${NomeCli}, Você Escolheu ${MemoriaSubSessao[NumIni].Nome}, Nesse Tamanho Você Tem direito de Escolher Até ${MemoriaSubSessao[NumIni].QuantSb} Sabores`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, ${AutoMsg}*` , Botao:Sabor , Tempo:TempMsg, Type:"butao"}] });
                                                                                         }) 
                                                                                         } else {
                                                                                             //Mudando a Fase do Chat
@@ -4920,7 +5243,7 @@ var NomeWhats = "";
                                                                                             
                                                                                             //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
                                                                                             console.log(TempMsg)
-                                                                                            response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: `*${NomeCli}, Você Escolheu ${MemoriaSubSessao[NumIni].Nome}*`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, ${AutoMsg}*` , Botao:Sabor , Tempo:TempMsg, Type:"butao"}] });
+                                                                                            response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: `${NomeCli}, Você Escolheu ${MemoriaSubSessao[NumIni].Nome}*`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, ${AutoMsg}` , Botao:Sabor , Tempo:TempMsg, Type:"butao"}] });
                                                                                         }) 
                                                 
                                                                                         }
@@ -4983,7 +5306,7 @@ var NomeWhats = "";
                                                                                             
                                                                                             //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
                                                                                             console.log(TempMsg)
-                                                                                            response.json({ Inf:[{Msg: `*${NomeCli}, Você Escolheu ${MemoriaSubSessao[NumIni].Nome}, Nesse Tamanho Você Tem direito de Escolher Até ${MemoriaSubSessao[NumIni].QuantSb} Sabor*`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, Escolha o ${AutoMsg2}*` , Botao:Menus , Tempo:TempMsg, Type:"butao"}] });
+                                                                                            response.json({ Inf:[{Msg: `${NomeCli}, Você Escolheu ${MemoriaSubSessao[NumIni].Nome}`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, Escolha o ${AutoMsg2}*` , Botao:Menus , Tempo:TempMsg, Type:"butao"}] });
                                                                                         }) 
                                                                                         } else {
                                                                                             //Mudando a Fase do Chat
@@ -5049,7 +5372,7 @@ var NomeWhats = "";
                                                                                             
                                                                                             //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
                                                                                             console.log(TempMsg)
-                                                                                            response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: `*${NomeCli}, Você Escolheu ${MemoriaSubSessao[NumIni].Nome}*`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, Escolha o ${AutoMsg2}*` , Botao:Menus , Tempo:TempMsg, Type:"butao"}] });
+                                                                                            response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: `${NomeCli}, Você Escolheu ${MemoriaSubSessao[NumIni].Nome}`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, Escolha o ${AutoMsg2}*` , Botao:Menus , Tempo:TempMsg, Type:"butao"}] });
                                                                                         }) 
                                                 
                                                                                         }
@@ -5219,7 +5542,6 @@ var NomeWhats = "";
                                                                 await db.collection("MenusSite")
                                                                 .where("Empresa", "==", EMPRESA)
                                                                 .where("Ativo", "==", true)
-                                                                .where("MemFim", "==", false)
                                                                 .get().then(async (querySnapshot23) => {
                                                                     await querySnapshot23.forEach((doc23) => {
                                 
@@ -5418,7 +5740,7 @@ var NomeWhats = "";
                                                                                   
                                                                                         //Escolhendo os itens da sessão escolhida
                                                                                         var Menus = MemoriaProduto
-                                                                                        var Sabor = [{id:"0", body:"Voltar para Tamanho"}]
+                                                                                        var Sabor = [{id:"0", body:"Voltar para Sessão"}]
                                                                                      
                                                                                         
                                                         
@@ -5612,7 +5934,7 @@ var NomeWhats = "";
                                                                                         
                                                                                         //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
                                                                                         console.log(TempMsg)
-                                                                                        response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: `${NomeCli}, Você Escolheu ${NumIni}  Sabor${NumIni>1?"Es":""}`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, Escolha o 1° ${AutoMsg}*` , Botao:Menus , Tempo:TempMsg, Type:"butao"}] });
+                                                                                        response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: `${NomeCli}, Você Escolheu ${NumIni}  Sabor${NumIni>1?"es":""}`  , Tempo:2000, Type:"text"}, {Msg: `*${NomeCli}, Escolha o 1° ${AutoMsg}*` , Botao:Menus , Tempo:TempMsg, Type:"butao"}] });
                                                                                     }) 
                                             
                                                                                     }
@@ -5777,7 +6099,6 @@ var NomeWhats = "";
                                                                     await db.collection("MenusSite")
                                                                     .where("Empresa", "==", EMPRESA)
                                                                     .where("Ativo", "==", true)
-                                                                    .where("MemFim", "==", false)
                                                                     .get().then(async (querySnapshot23) => {
                                                                         await querySnapshot23.forEach((doc23) => {
                                     
@@ -6091,6 +6412,7 @@ var NomeWhats = "";
                                                                             ItemEspeci:MemoriaProduto[NumIni].ItemEspeci?MemoriaProduto[NumIni].ItemEspeci:false,
                                                                             QuantGeral:Quant.length,
                                                                             Sessao:SessaoEsta,
+                                                                            MemFim:MemoriaProduto[NumIni].MemFim,
                                                                         
                                                                         },
                                                                             DigiteNaRegra:true,
@@ -6147,9 +6469,13 @@ var NomeWhats = "";
                                                                                 MsgPedido = MsgPedido + "\n===================\n"
                                                                                 MsgPedido = MsgPedido + "🛍️ "+SessaoEsta+"\n"
                                                                                 MsgPedido = MsgPedido + "📦"+MemoriaProduto[NumIni].Nome+"\n"                                                                              
-                                                                                if(MemoriaProduto[NumIni].Descricao){
-                                                                                    MsgPedido = MsgPedido + "📝"+MemoriaProduto[NumIni].Descricao+"\n"
+                                                                               
+                                                                                    if( MemoriaProduto[NumIni].Descricao === ""){
+                                                                
+                                                                                    } else {
+                                                                                       MsgPedido = MsgPedido + "📝"+MemoriaProduto[NumIni].Descricao+"\n"
                                                                                     }
+
                                                                                 if(MemoriaProduto[NumIni].ItemEspeci){
                                                                                 MsgPedido = MsgPedido + "🏷️"+MemoriaProduto[NumIni].SubSessao+"\n"
                                                                                 }
@@ -6188,6 +6514,7 @@ var NomeWhats = "";
                                                                             ItemEspeci:MemoriaProduto[NumIni].ItemEspeci?MemoriaProduto[NumIni].ItemEspeci:false,
                                                                             QuantGeral:Quant.length,
                                                                             Sessao:SessaoEsta,
+                                                                            MemFim:MemoriaProduto[NumIni].MemFim,
                                                                         },
                                                                         DigiteNaRegra:true,
                                                                         Robotizado:true, 
@@ -6248,10 +6575,14 @@ var NomeWhats = "";
                                                                             var MsgPedido = NomeCli+AutoMsg;
                                                                                 MsgPedido = MsgPedido + "\n===================\n"
                                                                                 MsgPedido = MsgPedido + "🛍️ "+SessaoEsta+"\n"
-                                                                                MsgPedido = MsgPedido + "📦"+MemoriaProduto[NumIni].Nome+"\n"                                                                              
-                                                                                if(MemoriaProduto[NumIni].Descricao){
-                                                                                    MsgPedido = MsgPedido + "📝"+MemoriaProduto[NumIni].Descricao+"\n"
-                                                                                    }
+                                                                                MsgPedido = MsgPedido + "📦"+MemoriaProduto[NumIni].Nome+"\n"
+
+                                                                                if( MemoriaProduto[NumIni].Descricao === ""){
+                                                                
+                                                                                } else {
+                                                                                   MsgPedido = MsgPedido + "📝"+MemoriaProduto[NumIni].Descricao+"\n"
+                                                                                }
+
                                                                                 if(MemoriaProduto[NumIni].ItemEspeci){
                                                                                 MsgPedido = MsgPedido + "🏷️"+MemoriaProduto[NumIni].SubSessao+"\n"
                                                                                 }
@@ -6433,7 +6764,6 @@ var NomeWhats = "";
                                                                             await db.collection("MenusSite")
                                                                             .where("Empresa", "==", EMPRESA)
                                                                             .where("Ativo", "==", true)
-                                                                            .where("MemFim", "==", false)
                                                                             .get().then(async (querySnapshot23) => {
                                                                                 await querySnapshot23.forEach((doc23) => {
                                             
@@ -7290,7 +7620,766 @@ var NomeWhats = "";
                                                                         
                                                                                     
                                                                                         
+                                                                        } else if(FaMsg === "Msg5A" ){//Recebendo Sim ou Não de Retirar, (Não)Enviando a Nota Com A pergunta do que quer realizar ou (Sim)Perguntar o que quer retirar
+                                                                            var NumIni = parseInt(Mensagem.body)  
+                                                                            var NumArray = NumIni - 1;
+
+                                                                            console.log("Entrada "+NumIni)
+                                                                            console.log("Quantidade "+NumArray)
+                                                                            if(Mensagem.body === "0" || Mensagem.body === " 0" || Mensagem.body === "0 " || Mensagem.body === " 0 "){
+                                            
+                                                                                //Escolhendo os itens da sessão escolhida
+                                                                                var Menus = MemoriaPedido;
+                                                                                var PedidosItens = []
+                                                                              
+                                                                                console.log(Menus)
+                                                
+                                                
+                                                                                  //montar a mensagem   
+                                                                             var QMsg= MsgEmp.Msg4G.Msg.length;
+                                                                             var Sorteio = Math.floor(Math.random() * (QMsg - 1 + 1)) + 1;
+                                                                             var Result =parseInt(Sorteio);
+                                                                             var Num = Result-1;
+                                                                             var AutoMsg = MsgEmp.Msg4G.Msg[Num];
+                                                                             var TempMsg =  MsgEmp.Msg4G.TempoSeg;
+                                                                      
+                                                                             console.log(MsgEmp.Msg4B.Msg)
+                                                                             console.log("Qmsg: "+QMsg)       
+                                                                             console.log("Soteio: "+Sorteio)                 
+                                                                             console.log("Msg: "+AutoMsg)
+                                    
+                                                                                 //Mensagem parabenizando que ele acertou a digitação 
+                                                                            var QMsg9= MsgEmp.Msg16B.Msg.length;
+                                                                            var Sorteio9 = Math.floor(Math.random() * (QMsg9 - 1 + 1)) + 1;
+                                                                            var Result9 =parseInt(Sorteio9);
+                                                                            var Num9 = Result9-1;
+                                                                            var AutoMsg9 = MsgEmp.Msg16B.Msg[Num9];
+                                                                            var TempMsg9 =  MsgEmp.Msg16B.TempoSeg;
+                                                         
+                                                           
+                                                                             var QMsg2= MsgEmp.Msg6A.Msg.length;
+                                                                             var Sorteio2 = Math.floor(Math.random() * (QMsg2 - 1 + 1)) + 1;
+                                                                             var Result2 =parseInt(Sorteio2);
+                                                                             var Num2 = Result2-1;
+                                                                             var AutoMsg2 = MsgEmp.Msg6A.Msg[Num2];
+                                                                             var TempMsg2 =  MsgEmp.Msg6A.TempoSeg;
+                                                         
+                                                                            //  console.log(MsgEmp.Msg3A.Msg)
+                                                                            //  console.log("Qmsg: "+QMsg2)       
+                                                                            //  console.log("Soteio: "+Sorteio2)                 
+                                                                            //  console.log("Msg: "+AutoMsg2)
+                                                                            
+                                    
+                                                                              //Mensagens de estimulo 
+                                                                              var QMsg3= MsgEmp.Msg17A.Msg.length;
+                                                                              var QMsg4= MsgEmp.Msg17B.Msg.length;
+                                                                              var QMsg5= MsgEmp.Msg17C.Msg.length;
+                                                                              var Sorteio3 = Math.floor(Math.random() * (QMsg3 - 1 + 1)) + 1;
+                                                                              var Sorteio4 = Math.floor(Math.random() * (QMsg4 - 1 + 1)) + 1;
+                                                                              var Sorteio5 = Math.floor(Math.random() * (QMsg5 - 1 + 1)) + 1;
+                                                                  
+                                                                              var Result3 =parseInt(Sorteio3);
+                                                                              var Result4 =parseInt(Sorteio4);
+                                                                              var Result5 =parseInt(Sorteio5);
+                                                                  
+                                                                              var Num3 = Result3-1;
+                                                                              var Num4 = Result4-1;
+                                                                              var Num5 = Result5-1;
+                                                                              var AutoMsg3 = MsgEmp.Msg17A.Msg[Num3];
+                                                                              var AutoMsg4= MsgEmp.Msg17B.Msg[Num4];
+                                                                              var AutoMsg5= MsgEmp.Msg17C.Msg[Num5];
+                                                                              var Tempo3 = MsgEmp.Msg17A.TempoSeg + new Date().getTime();
+                                                                              var Tempo4 = MsgEmp.Msg17B.TempoSeg + new Date().getTime();
+                                                                              var Tempo5 = MsgEmp.Msg17C.TempoSeg + new Date().getTime();
+                                                                             console.log("id : "+PedidoCri)
+                            
+                                                                            
+                            
+                                                                              await db.collection("MesaItem")
+                                                                              .doc(PedidoCri)
+                                                                              .get().then((doc)=>{
+                                                                                PedidosItens = doc.data().Itens;
+                                                                              })
+                                                                              console.log(PedidosItens)
+                                                        
+                                                                              if(Robo === true && EstaNaRegra === true){
+                                                                              //Mudando a Fase do Chat
+                                                                              await db.collection("ChatCliente")
+                                                                              .doc(IdChat)
+                                                                              .update({
+                                                                                MemSessao:[],
+                                                                                MemPedido:[],
+                                                                                MemProdutos:[],
+                                                                                MemSubSessao:[],
+                                                                                MenSabor:0,
+                                                                                EscolhaSabor:0, 
+                                                                                Sessao:"",
+                                                                              FaseMsg: "Msg6A",
+                                                                              DigiteNaRegra:true,
+                                                                              Robotizado:true, 
+                                                                              MsgFutura1:{
+                                                                                  Ativo:true,
+                                                                                  Msg:AutoMsg3,
+                                                                                  Tempo:Tempo3,
+                                                                              },
+                                                                              MsgFutura2:{
+                                                                                  Ativo:true,
+                                                                                  Msg:AutoMsg4,
+                                                                                  Tempo:Tempo4,
+                                                                              },
+                                                                              MsgFutura3:{
+                                                                                  Ativo:true,
+                                                                                  Msg:AutoMsg5,
+                                                                                  Tempo:Tempo5,
+                                                                              },
+                                                                              UltimaMsg:{
+                                                                                 Autor:EMPRESA,
+                                                                                 body:`${NomeCli}${AutoMsg2}`,
+                                                                                 date:new Date().getTime()+5000,
+                                                                                 Type:"botao"
+                                                                             },
+                                                                              Mensagem:admin.firestore.FieldValue.arrayUnion({
+                                                                                 Autor:IdCli,
+                                                                                 body:Mensagem.body,
+                                                                                 date:new Date().getTime(),
+                                                                                 Type:"text"
+                                                                             },
+                                                                            
+                                                                             {
+                                                                                 Autor:EMPRESA,
+                                                                                 body:`${NomeCli}${AutoMsg}`,
+                                                                                 date:new Date().getTime()+7000,
+                                                                                 Type:"text"
+                                                                             },
+                                                                             {
+                                                                                Autor:EMPRESA,
+                                                                                body:`${NomeCli}${AutoMsg2}`,
+                                                                                Botao:MsgEmp.Msg6A.Botao,
+                                                                                date:new Date().getTime()+8000,
+                                                                                Type:"botao"
+                                                                            },
+                                                                             
+                                                                             
+                                                                             )
+                                                                              })
+                                                                              .then(async() => {
+                                                                                 
+                                                                                var MsgPedido = NomeCli+", "+ AutoMsg;
+                                                                                var TotalValor = 0
+                                                                                for(let i in PedidosItens){
+                                                                                    
+                                                                                
+                                                                                    MsgPedido = MsgPedido + "\n===================\n"
+                                                                                    MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
+                                                                                    
+                                                                                        MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
+                                                                                        if(PedidosItens[i].Descricao){
+                                                                                            MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                                                         }
+                                                                                   
+                                                                                    if(PedidosItens[i].ItemEspeci){
+                                                                                        MsgPedido = MsgPedido + "🏷️"+PedidosItens[i].SubSessao+"\n"
+                                                                                     }
+                                                                                   
+                                                                                    if(PedidosItens[i].Descont){
+                                                                                        TotalValor = TotalValor + (PedidosItens[i].Descont*PedidosItens[i].Quant)
+                                                                                       MsgPedido = MsgPedido + "💰 De:"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                       MsgPedido = MsgPedido + "❤️ Por:"+PedidosItens[i].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                                       if(PedidosItens[i].Observacao){
+                                                                                        MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                                       }
+                                                                                    } else {
+                                                                                        TotalValor = TotalValor + (PedidosItens[i].Preco*PedidosItens[i].Quant)
+                                                                                       MsgPedido = MsgPedido + "💰"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                                       if(PedidosItens[i].Observacao){
+                                                                                        MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                                       }
+                                                                                    }
+                            
+                                                                                }
+                                                                                MsgPedido = MsgPedido + "\n===================\n"
+                                                                                MsgPedido = MsgPedido + "Total : "+TotalValor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+                                                                             
+                                                                                   
+                                                                                 
+                                                                              
+                                                                                response.json({ Inf:[{Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg2}*` , Botao:MsgEmp.Msg6A.Botao , Tempo:TempMsg2, Type:"butao"}] });
+                                                                              }) 
+                                                                            } else {
+                                                                                  //Mudando a Fase do Chat
+                                                                              await db.collection("ChatCliente")
+                                                                              .doc(IdChat)
+                                                                              .update({
+                                                                                MemSessao:[],
+                                                                                MemPedido:[],
+                                                                                MemProdutos:[],
+                                                                                MemSubSessao:[],
+                                                                                MenSabor:0,
+                                                                                EscolhaSabor:0, 
+                                                                              FaseMsg: "Msg6A",
+                                                                              DigiteNaRegra:true,
+                                                                              Robotizado:true, 
+                                                                              MsgFutura1:{
+                                                                                  Ativo:true,
+                                                                                  Msg:AutoMsg3,
+                                                                                  Tempo:Tempo3,
+                                                                              },
+                                                                              MsgFutura2:{
+                                                                                  Ativo:true,
+                                                                                  Msg:AutoMsg4,
+                                                                                  Tempo:Tempo4,
+                                                                              },
+                                                                              MsgFutura3:{
+                                                                                  Ativo:true,
+                                                                                  Msg:AutoMsg5,
+                                                                                  Tempo:Tempo5,
+                                                                              },
+                                                                              UltimaMsg:{
+                                                                                 Autor:EMPRESA,
+                                                                                 body:`${NomeCli}${AutoMsg}`,
+                                                                                 date:new Date().getTime()+5000,
+                                                                                 Type:"butao"
+                                                                             },
+                                                                              Mensagem:admin.firestore.FieldValue.arrayUnion({
+                                                                                 Autor:IdCli,
+                                                                                 body:Mensagem.body,
+                                                                                 date:new Date().getTime(),
+                                                                                 Type:"text"
+                                                                             },
+                                                                             {
+                                                                                Autor:EMPRESA,
+                                                                                body:`${NomeCli}${AutoMsg9}`,
+                                                                                Botao:Menus,
+                                                                                date:new Date().getTime()+2000,
+                                                                                Type:"text"
+                                                                            },
+                                                                             {
+                                                                                 Autor:EMPRESA,
+                                                                                 body:`${NomeCli}${AutoMsg}`,
+                                                                                 Botao:Menus,
+                                                                                 date:new Date().getTime()+5000,
+                                                                                 Type:"text"
+                                                                             },
+                                                                             {
+                                                                                Autor:EMPRESA,
+                                                                                body:`${NomeCli}${AutoMsg2}`,
+                                                                                Botao:MsgEmp.Msg6A.Botao,
+                                                                                date:new Date().getTime()+8000,
+                                                                                Type:"botao"
+                                                                            },
+                                                                             
+                                                                             
+                                                                             )
+                                                                              })
+                                                                              .then(async() => {
+                                                                                var MsgPedido = NomeCli+", "+ AutoMsg;
+                                                                                var TotalValor = 0
+                                                                                for(let i in PedidosItens){
+                                                                                    
+                                                                                
+                                                                                    MsgPedido = MsgPedido + "\n===================\n"
+                                                                                    MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
+                                                                                    
+                                                                                        MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
+                                                                                        if(PedidosItens[i].Descricao){
+                                                                                            MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                                                         }
+                                                                                    
+                                                                                    if(PedidosItens[i].ItemEspeci){
+                                                                                        MsgPedido = MsgPedido + "🏷️"+PedidosItens[i].SubSessao+"\n"
+                                                                                     }
+                                                                                  
+                                                                                    if(PedidosItens[i].Descont){
+                                                                                        TotalValor = TotalValor + (PedidosItens[i].Descont*PedidosItens[i].Quant)
+                                                                                       MsgPedido = MsgPedido + "💰 De:"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                       MsgPedido = MsgPedido + "❤️ Por:"+PedidosItens[i].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                                       if(PedidosItens[i].Observacao){
+                                                                                        MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                                       }
+                                                                                    } else {
+                                                                                        TotalValor = TotalValor + (PedidosItens[i].Preco*PedidosItens[i].Quant)
+                                                                                       MsgPedido = MsgPedido + "💰"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                       MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                                       if(PedidosItens[i].Observacao){
+                                                                                        MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                                       }
+                                                                                    }
+                            
+                                                                                }
+                                                                                MsgPedido = MsgPedido + "\n===================\n"
+                                                                                MsgPedido = MsgPedido + "Total : "+TotalValor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+                                                                                   
+                                                                                 
+                                                                              
+                                                                                response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg2}*` , Botao:MsgEmp.Msg6A.Botao , Tempo:TempMsg2, Type:"butao"}] });
+                                                                                 
+                                                                                 //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
+                                                                                
+                                                                               
+                                                                              }) 
+                                    
+                                                                            
+                                                
                                                                         }
+                                                                            
+                                                                      
+                                                                        
+                                                                            
+                                                                          
+                                                                            } else if(NumArray >= 0 && NumArray < MemoriaPedido.length){
+                                                                            
+                                                                                    //Escolhendo os itens da sessão escolhida
+                                                                                    var Menus = [];
+                                                                                    var PedidosItens = MemoriaPedido.filter((item, index) => index !== NumArray )
+                                                                                  
+                                                                                    console.log(Menus)
+                                                    
+                                                    
+                                                                                      //montar a mensagem   
+                                                                                 var QMsg= MsgEmp.Msg4G.Msg.length;
+                                                                                 var Sorteio = Math.floor(Math.random() * (QMsg - 1 + 1)) + 1;
+                                                                                 var Result =parseInt(Sorteio);
+                                                                                 var Num = Result-1;
+                                                                                 var AutoMsg = MsgEmp.Msg4G.Msg[Num];
+                                                                                 var TempMsg =  MsgEmp.Msg4G.TempoSeg;
+                                                                          
+                                                                                 console.log(MsgEmp.Msg4B.Msg)
+                                                                                 console.log("Qmsg: "+QMsg)       
+                                                                                 console.log("Soteio: "+Sorteio)                 
+                                                                                 console.log("Msg: "+AutoMsg)
+                                        
+                                                                                     //Mensagem parabenizando que ele acertou a digitação 
+                                                                                var QMsg9= MsgEmp.Msg16B.Msg.length;
+                                                                                var Sorteio9 = Math.floor(Math.random() * (QMsg9 - 1 + 1)) + 1;
+                                                                                var Result9 =parseInt(Sorteio9);
+                                                                                var Num9 = Result9-1;
+                                                                                var AutoMsg9 = MsgEmp.Msg16B.Msg[Num9];
+                                                                                var TempMsg9 =  MsgEmp.Msg16B.TempoSeg;
+                                                             
+                                                               
+                                                                                 var QMsg2= MsgEmp.Msg6A.Msg.length;
+                                                                                 var Sorteio2 = Math.floor(Math.random() * (QMsg2 - 1 + 1)) + 1;
+                                                                                 var Result2 =parseInt(Sorteio2);
+                                                                                 var Num2 = Result2-1;
+                                                                                 var AutoMsg2 = MsgEmp.Msg6A.Msg[Num2];
+                                                                                 var TempMsg2 =  MsgEmp.Msg6A.TempoSeg;
+                                                             
+                                                                                //  console.log(MsgEmp.Msg3A.Msg)
+                                                                                //  console.log("Qmsg: "+QMsg2)       
+                                                                                //  console.log("Soteio: "+Sorteio2)                 
+                                                                                //  console.log("Msg: "+AutoMsg2)
+                                                                                
+                                        
+                                                                                  //Mensagens de estimulo 
+                                                                                  var QMsg3= MsgEmp.Msg17A.Msg.length;
+                                                                                  var QMsg4= MsgEmp.Msg17B.Msg.length;
+                                                                                  var QMsg5= MsgEmp.Msg17C.Msg.length;
+                                                                                  var Sorteio3 = Math.floor(Math.random() * (QMsg3 - 1 + 1)) + 1;
+                                                                                  var Sorteio4 = Math.floor(Math.random() * (QMsg4 - 1 + 1)) + 1;
+                                                                                  var Sorteio5 = Math.floor(Math.random() * (QMsg5 - 1 + 1)) + 1;
+                                                                      
+                                                                                  var Result3 =parseInt(Sorteio3);
+                                                                                  var Result4 =parseInt(Sorteio4);
+                                                                                  var Result5 =parseInt(Sorteio5);
+                                                                      
+                                                                                  var Num3 = Result3-1;
+                                                                                  var Num4 = Result4-1;
+                                                                                  var Num5 = Result5-1;
+                                                                                  var AutoMsg3 = MsgEmp.Msg17A.Msg[Num3];
+                                                                                  var AutoMsg4= MsgEmp.Msg17B.Msg[Num4];
+                                                                                  var AutoMsg5= MsgEmp.Msg17C.Msg[Num5];
+                                                                                  var Tempo3 = MsgEmp.Msg17A.TempoSeg + new Date().getTime();
+                                                                                  var Tempo4 = MsgEmp.Msg17B.TempoSeg + new Date().getTime();
+                                                                                  var Tempo5 = MsgEmp.Msg17C.TempoSeg + new Date().getTime();
+                                                                                 console.log("id : "+PedidoCri)
+                                
+                                                                                  await db.collection("MesaItem")
+                                                                                  .doc(PedidoCri)
+                                                                                  .update({
+                                                                                    Itens:PedidosItens 
+                                                                                  }).then((doc)=>{
+                                                                                    //PedidosItens = doc.data().Itens;
+                                                                                  })
+                                
+                                                                                //   await db.collection("MesaItem")
+                                                                                //   .doc(PedidoCri)
+                                                                                //   .get().then((doc)=>{
+                                                                                //     PedidosItens = doc.data().Itens;
+                                                                                //   })
+                                                                                  console.log(PedidosItens)
+                                                            
+                                                                                  if(Robo === true && EstaNaRegra === true){
+                                                                                  //Mudando a Fase do Chat
+                                                                                  await db.collection("ChatCliente")
+                                                                                  .doc(IdChat)
+                                                                                  .update({
+                                                                                    MemSessao:[],
+                                                                                    MemPedido:[],
+                                                                                    MemProdutos:[],
+                                                                                    MemSubSessao:[],
+                                                                                    MenSabor:0,
+                                                                                    EscolhaSabor:0, 
+                                                                                    Sessao:"",
+                                                                                  FaseMsg: "Msg6A",
+                                                                                  DigiteNaRegra:true,
+                                                                                  Robotizado:true, 
+                                                                                  MsgFutura1:{
+                                                                                      Ativo:true,
+                                                                                      Msg:AutoMsg3,
+                                                                                      Tempo:Tempo3,
+                                                                                  },
+                                                                                  MsgFutura2:{
+                                                                                      Ativo:true,
+                                                                                      Msg:AutoMsg4,
+                                                                                      Tempo:Tempo4,
+                                                                                  },
+                                                                                  MsgFutura3:{
+                                                                                      Ativo:true,
+                                                                                      Msg:AutoMsg5,
+                                                                                      Tempo:Tempo5,
+                                                                                  },
+                                                                                  UltimaMsg:{
+                                                                                     Autor:EMPRESA,
+                                                                                     body:`${NomeCli}${AutoMsg2}`,
+                                                                                     date:new Date().getTime()+5000,
+                                                                                     Type:"botao"
+                                                                                 },
+                                                                                  Mensagem:admin.firestore.FieldValue.arrayUnion({
+                                                                                     Autor:IdCli,
+                                                                                     body:Mensagem.body,
+                                                                                     date:new Date().getTime(),
+                                                                                     Type:"text"
+                                                                                 },
+                                                                                
+                                                                                 {
+                                                                                     Autor:EMPRESA,
+                                                                                     body:`${NomeCli}${AutoMsg}`,
+                                                                                     date:new Date().getTime()+7000,
+                                                                                     Type:"text"
+                                                                                 },
+                                                                                 {
+                                                                                    Autor:EMPRESA,
+                                                                                    body:`${NomeCli}${AutoMsg2}`,
+                                                                                    Botao:MsgEmp.Msg6A.Botao,
+                                                                                    date:new Date().getTime()+8000,
+                                                                                    Type:"botao"
+                                                                                },
+                                                                                 
+                                                                                 
+                                                                                 )
+                                                                                  })
+                                                                                  .then(async() => {
+                                                                                     
+                                                                                    var MsgPedido = NomeCli+", "+ AutoMsg;
+                                                                                    var TotalValor = 0
+                                                                                    for(let i in PedidosItens){
+                                                                                        
+                                                                                    
+                                                                                        MsgPedido = MsgPedido + "\n===================\n"
+                                                                                        MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
+                                                                                        
+                                                                                            MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
+                                                                                            if(PedidosItens[i].Descricao){
+                                                                                                MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                                                             }
+                                                                                       
+                                                                                        if(PedidosItens[i].ItemEspeci){
+                                                                                            MsgPedido = MsgPedido + "🏷️"+PedidosItens[i].SubSessao+"\n"
+                                                                                         }
+                                                                                       
+                                                                                        if(PedidosItens[i].Descont){
+                                                                                            TotalValor = TotalValor + (PedidosItens[i].Descont*PedidosItens[i].Quant)
+                                                                                           MsgPedido = MsgPedido + "💰 De:"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                           MsgPedido = MsgPedido + "❤️ Por:"+PedidosItens[i].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                           MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                                           if(PedidosItens[i].Observacao){
+                                                                                            MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                                           }
+                                                                                        } else {
+                                                                                            TotalValor = TotalValor + (PedidosItens[i].Preco*PedidosItens[i].Quant)
+                                                                                           MsgPedido = MsgPedido + "💰"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                           MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                                           if(PedidosItens[i].Observacao){
+                                                                                            MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                                           }
+                                                                                        }
+                                
+                                                                                    }
+                                                                                    MsgPedido = MsgPedido + "\n===================\n"
+                                                                                    MsgPedido = MsgPedido + "Total : "+TotalValor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+                                                                                 
+                                                                                       
+                                                                                     
+                                                                                  
+                                                                                    response.json({ Inf:[{Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg2}*` , Botao:MsgEmp.Msg6A.Botao , Tempo:TempMsg2, Type:"butao"}] });
+                                                                                  }) 
+                                                                                } else {
+                                                                                      //Mudando a Fase do Chat
+                                                                                  await db.collection("ChatCliente")
+                                                                                  .doc(IdChat)
+                                                                                  .update({
+                                                                                    MemSessao:[],
+                                                                                    MemPedido:[],
+                                                                                    MemProdutos:[],
+                                                                                    MemSubSessao:[],
+                                                                                    MenSabor:0,
+                                                                                    EscolhaSabor:0, 
+                                                                                  FaseMsg: "Msg6A",
+                                                                                  DigiteNaRegra:true,
+                                                                                  Robotizado:true, 
+                                                                                  MsgFutura1:{
+                                                                                      Ativo:true,
+                                                                                      Msg:AutoMsg3,
+                                                                                      Tempo:Tempo3,
+                                                                                  },
+                                                                                  MsgFutura2:{
+                                                                                      Ativo:true,
+                                                                                      Msg:AutoMsg4,
+                                                                                      Tempo:Tempo4,
+                                                                                  },
+                                                                                  MsgFutura3:{
+                                                                                      Ativo:true,
+                                                                                      Msg:AutoMsg5,
+                                                                                      Tempo:Tempo5,
+                                                                                  },
+                                                                                  UltimaMsg:{
+                                                                                     Autor:EMPRESA,
+                                                                                     body:`${NomeCli}${AutoMsg}`,
+                                                                                     date:new Date().getTime()+5000,
+                                                                                     Type:"butao"
+                                                                                 },
+                                                                                  Mensagem:admin.firestore.FieldValue.arrayUnion({
+                                                                                     Autor:IdCli,
+                                                                                     body:Mensagem.body,
+                                                                                     date:new Date().getTime(),
+                                                                                     Type:"text"
+                                                                                 },
+                                                                                 {
+                                                                                    Autor:EMPRESA,
+                                                                                    body:`${NomeCli}${AutoMsg9}`,
+                                                                                    date:new Date().getTime()+2000,
+                                                                                    Type:"text"
+                                                                                },
+                                                                                 {
+                                                                                     Autor:EMPRESA,
+                                                                                     body:`${NomeCli}${AutoMsg}`,
+                                                                                     date:new Date().getTime()+5000,
+                                                                                     Type:"text"
+                                                                                 },
+                                                                                 {
+                                                                                    Autor:EMPRESA,
+                                                                                    body:`${NomeCli}${AutoMsg2}`,
+                                                                                    Botao:MsgEmp.Msg6A.Botao,
+                                                                                    date:new Date().getTime()+8000,
+                                                                                    Type:"botao"
+                                                                                },
+                                                                                 
+                                                                                 
+                                                                                 )
+                                                                                  })
+                                                                                  .then(async() => {
+                                                                                    var MsgPedido = NomeCli+", "+ AutoMsg;
+                                                                                    var TotalValor = 0
+                                                                                    for(let i in PedidosItens){
+                                                                                        
+                                                                                    
+                                                                                        MsgPedido = MsgPedido + "\n===================\n"
+                                                                                        MsgPedido = MsgPedido + "🛍️ "+PedidosItens[i].Sessao+"\n"
+                                                                                        
+                                                                                            MsgPedido = MsgPedido + "📦"+PedidosItens[i].Nome+"\n"
+                                                                                            if(PedidosItens[i].Descricao){
+                                                                                                MsgPedido = MsgPedido + "📝"+PedidosItens[i].Descricao+"\n"
+                                                                                             }
+                                                                                        
+                                                                                        if(PedidosItens[i].ItemEspeci){
+                                                                                            MsgPedido = MsgPedido + "🏷️"+PedidosItens[i].SubSessao+"\n"
+                                                                                         }
+                                                                                      
+                                                                                        if(PedidosItens[i].Descont){
+                                                                                            TotalValor = TotalValor + (PedidosItens[i].Descont*PedidosItens[i].Quant)
+                                                                                           MsgPedido = MsgPedido + "💰 De:"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                           MsgPedido = MsgPedido + "❤️ Por:"+PedidosItens[i].Descont.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                           MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                                           if(PedidosItens[i].Observacao){
+                                                                                            MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                                           }
+                                                                                        } else {
+                                                                                            TotalValor = TotalValor + (PedidosItens[i].Preco*PedidosItens[i].Quant)
+                                                                                           MsgPedido = MsgPedido + "💰"+PedidosItens[i].Preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})+"\n"
+                                                                                           MsgPedido = MsgPedido + "🗳️ Quantidade: "+PedidosItens[i].Quant+"\n"
+                                                                                           if(PedidosItens[i].Observacao){
+                                                                                            MsgPedido = MsgPedido + "⚠️ Obs.: "+PedidosItens[i].Observacao+"\n"
+                                                                                           }
+                                                                                        }
+                                
+                                                                                    }
+                                                                                    MsgPedido = MsgPedido + "\n===================\n"
+                                                                                    MsgPedido = MsgPedido + "Total : "+TotalValor.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})
+                                                                                       
+                                                                                     
+                                                                                  
+                                                                                    response.json({ Inf:[{Msg:`${NomeCli}${AutoMsg9}`, Tempo: TempMsg9, Type:"text"}, {Msg: MsgPedido  , Tempo:TempMsg, Type:"text"}, {Msg: `*${NomeCli}${AutoMsg2}*` , Botao:MsgEmp.Msg6A.Botao , Tempo:TempMsg2, Type:"butao"}] });
+                                                                                     
+                                                                                     //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
+                                                                                    
+                                                                                   
+                                                                                  }) 
+                                        
+                                                                                
+                                                    
+                                                                            }
+                                                                                
+                                                                          
+                                                                            
+                                                                                
+                                                                              
+                                                                                }  else {
+                                                          
+                                                                                        if(EstaNaRegra === true && Robo === true){
+                                                    
+                                                                                            var QMsg= MsgEmp.Msg16A.Msg.length;
+                                                                                            var Sorteio = Math.floor(Math.random() * (QMsg - 1 + 1)) + 1;
+                                                                                            var Result =parseInt(Sorteio);
+                                                                                            var Num = Result-1;
+                                                                                            var AutoMsg = MsgEmp.Msg16A.Msg[Num];
+                                                                                            var TempMsg =  MsgEmp.Msg16A.TempoSeg;
+                                                    
+                                                                                              //mensagens de estimulo para continuar o atendimento
+                                                                                              var QMsg3= MsgEmp.Msg17A.Msg.length;
+                                                                                              var QMsg4= MsgEmp.Msg17B.Msg.length;
+                                                                                              var QMsg5= MsgEmp.Msg17C.Msg.length;
+                                                                                              var Sorteio3 = Math.floor(Math.random() * (QMsg3 - 1 + 1)) + 1;
+                                                                                              var Sorteio4 = Math.floor(Math.random() * (QMsg4 - 1 + 1)) + 1;
+                                                                                              var Sorteio5 = Math.floor(Math.random() * (QMsg5 - 1 + 1)) + 1;
+                                                                                  
+                                                                                              var Result3 =parseInt(Sorteio3);
+                                                                                              var Result4 =parseInt(Sorteio4);
+                                                                                              var Result5 =parseInt(Sorteio5);
+                                                                                  
+                                                                                              var Num3 = Result3-1;
+                                                                                              var Num4 = Result4-1;
+                                                                                              var Num5 = Result5-1;
+                                                                                              var AutoMsg3 = MsgEmp.Msg17A.Msg[Num3];
+                                                                                              var AutoMsg4= MsgEmp.Msg17B.Msg[Num4];
+                                                                                              var AutoMsg5= MsgEmp.Msg17C.Msg[Num5];
+                                                                                              var Tempo3 = MsgEmp.Msg17A.TempoSeg + new Date().getTime();
+                                                                                              var Tempo4 = MsgEmp.Msg17B.TempoSeg + new Date().getTime();
+                                                                                              var Tempo5 = MsgEmp.Msg17C.TempoSeg + new Date().getTime();
+                                                                                             //Mudando a Fase do Chat
+                                                                                            
+                                                                                             await db.collection("ChatCliente")
+                                                                                             .doc(IdChat)
+                                                                                             .update({
+                                                                                            DigiteNaRegra:false, 
+                                                                                            MsgFutura1:{
+                                                                                                Ativo:true,
+                                                                                                Msg:AutoMsg3,
+                                                                                                Tempo:Tempo3,
+                                                                                            },
+                                                                                            MsgFutura2:{
+                                                                                                Ativo:true,
+                                                                                                Msg:AutoMsg4,
+                                                                                                Tempo:Tempo4,
+                                                                                            },
+                                                                                            MsgFutura3:{
+                                                                                                Ativo:true,
+                                                                                                Msg:AutoMsg5,
+                                                                                                Tempo:Tempo5,
+                                                                                            },
+                                                                                             UltimaMsg:{
+                                                                                                Autor:EMPRESA,
+                                                                                                body:`${NomeCli}${AutoMsg}`,
+                                                                                                date:new Date().getTime()+5000,
+                                                                                                Type:"text"
+                                                                                            },
+                                                                                             Mensagem:admin.firestore.FieldValue.arrayUnion({
+                                                                                                Autor:IdCli,
+                                                                                                body:Mensagem.body,
+                                                                                                date:new Date().getTime(),
+                                                                                                Type:"text"
+                                                                                            },
+                                                                                            {
+                                                                                                Autor:EMPRESA,
+                                                                                                body:`${NomeCli}${AutoMsg}`,
+                                                                                                date:new Date().getTime()+5000,
+                                                                                                Type:"text"
+                                                                                            },
+                                                                                            
+                                                                                            
+                                                                                            )
+                                                                                             })
+                                                                                             .then(async() => {
+                                                                                                var MsgButon =`*${Mensagem.body}${AutoMsg2}*`
+                                                                                                //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
+                                                                                                console.log(TempMsg)
+                                                                                                response.json({ Inf:[{Msg: `*${NomeCli}${AutoMsg}*` , Tempo:TempMsg, Type:"text"}] });
+                                                                                      
+                                                                                             }) 
+                                                                                        } else  if(EstaNaRegra === false && Robo === true){
+                                                    
+                                                                                              //mensagens de estimulo para continuar o atendimento
+                                                                                              var QMsg3= MsgEmp.Msg17A.Msg.length;
+                                                                                              var QMsg4= MsgEmp.Msg17B.Msg.length;
+                                                                                              var QMsg5= MsgEmp.Msg17C.Msg.length;
+                                                                                              var Sorteio3 = Math.floor(Math.random() * (QMsg3 - 1 + 1)) + 1;
+                                                                                              var Sorteio4 = Math.floor(Math.random() * (QMsg4 - 1 + 1)) + 1;
+                                                                                              var Sorteio5 = Math.floor(Math.random() * (QMsg5 - 1 + 1)) + 1;
+                                                                                  
+                                                                                              var Result3 =parseInt(Sorteio3);
+                                                                                              var Result4 =parseInt(Sorteio4);
+                                                                                              var Result5 =parseInt(Sorteio5);
+                                                                                  
+                                                                                              var Num3 = Result3-1;
+                                                                                              var Num4 = Result4-1;
+                                                                                              var Num5 = Result5-1;
+                                                                                              var AutoMsg3 = MsgEmp.Msg17A.Msg[Num3];
+                                                                                              var AutoMsg4= MsgEmp.Msg17B.Msg[Num4];
+                                                                                              var AutoMsg5= MsgEmp.Msg17C.Msg[Num5];
+                                                                                              var Tempo3 = MsgEmp.Msg17A.TempoSeg + new Date().getTime();
+                                                                                              var Tempo4 = MsgEmp.Msg17B.TempoSeg + new Date().getTime();
+                                                                                              var Tempo5 = MsgEmp.Msg17C.TempoSeg + new Date().getTime();
+                                                                        
+                                                                                          
+                                                                                        
+                                                                                          
+                                                                                             //Mudando a Fase do Chat
+                                                                                            
+                                                                                             await db.collection("ChatCliente")
+                                                                                             .doc(IdChat)
+                                                                                             .update({
+                                                                                            Robotizado:false, 
+                                                                                            MsgFutura1:{
+                                                                                                Ativo:true,
+                                                                                                Msg:AutoMsg3,
+                                                                                                Tempo:Tempo3,
+                                                                                            },
+                                                                                            MsgFutura2:{
+                                                                                                Ativo:true,
+                                                                                                Msg:AutoMsg4,
+                                                                                                Tempo:Tempo4,
+                                                                                            },
+                                                                                            MsgFutura3:{
+                                                                                                Ativo:true,
+                                                                                                Msg:AutoMsg5,
+                                                                                                Tempo:Tempo5,
+                                                                                            },
+                                                                                             })
+                                                                                             .then(async() => {
+                                                                                                var MsgButon =`*${Mensagem.body}${AutoMsg2}*`
+                                                                                                //MsgButon = + "(Clique em Uma das Opções abaixo, Por favor!)"
+                                                                                                console.log(TempMsg)
+                                                                                                response.json({ Inf:[{Msg: `*${NomeCli}*` , Botao:Menus , Tempo:TempMsg, Type:"butao"}] });
+                                                                                      
+                                                                                             }) 
+                                                                                        }
+                                                                                     }
+                                                             
+                                                                          
+                                                                             
+                                                                             }
                     
                     
                     
