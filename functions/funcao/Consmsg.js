@@ -1,6 +1,6 @@
 
 
- module.exports = (Msg, ItensMenus, DadoEmp) =>{
+ module.exports = (Msg, ItensMenus, DadoEmp, PedidoDupSes) =>{
     var PalNum1 = ["1", "um", "uma"]
     var PalNum2 = ["2", "duas", "dois"]
     var PalNum3 = ["3", "três", "tres", "trez"]
@@ -68,18 +68,20 @@
               var PodeSessao = true;
                               for(let i in ItensMenus){
                                   for(let j in ItensMenus[i].TagsMenus){
-                                    TagMModi =" "+ItensMenus[i].TagsMenus[j].toLowerCase()+" ";
+                                    TagMModi =" "+ItensMenus[i].TagsMenus[j].trim().toLowerCase()+" ";
                                      
                                       
                                       if(TagMModi !== "" && TagMModi !== " " && TagMModi !== "  " && TagMModi !== "   "){
 
                                       if(Msg.includes(TagMModi)){
-                                          
+                                        if(PedidoDupSes == false){   
+                                      
                                       for(let g in ItensPedido){
                                           if(ItensPedido[g].Sessao === ItensMenus[i].Sessao){
                                               PodeSessao = false; 
                                           }
                                       }
+                                    }
                                          
                                          if(PodeSessao){
 

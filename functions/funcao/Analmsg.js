@@ -2,15 +2,16 @@ const ConsMsg =  require("./Consmsg");
 const TamanhoMsg =  require("./Tamanhomsg");
 
 
- module.exports = (Msg, ItensMenus, DadoEmp, Msg1) =>{
+
+ module.exports = (Msg, ItensMenus, DadoEmp, Msg1, PedidoDupSes) =>{
     var TiraPalavra = [" traz ", " faz ", " caprichada ",  " boa noite ", "boa tarde ", " bom dia ", " oi ", " muito ",  " vai ", " demorar ", " ainda ", " meu " , " não  ", " cheque ", " fria ", " tamanho ", " com borda ", " sem borda ",  " com boda ", " um ", "uma ", " ne ", " quero ", " quero ", " uma ", " sabor ",  " eu ", " querer ", " quere", " vou ", " vou ", " pra ", " mim ", " meu ", " meu ", " bem ", " faz ", " por ", " por ", " favor ", " de ", " sabor ", " sabor ",  " mais ", " pedir ",  ]
     var PalCardapio = ["cardapio", "cardápio", "cadapio", "cadápio"]
     var PalPreco = ["preco", "preço", "quanto", "qnt", "valor" ];
     var PalEncerrou = ["encerrou", "funcionando"];
-    var PalNegacao = ["não", "nao", "ñ ", " ñ ", "ñ" , "só isso", "so isso"];
+    var PalNegacao = ["não", "nao", "ñ ", " ñ ", "ñ" , "só isso", "so isso", "somente isso"];
     var PalPositivo = ["sim", "quais sao", "quais são", "que tem "];
     var PalNegEnd = ["não", "nao", "ñ ", " ñ ", "ñ" , "outro", ];
-    var PalEntrega = [" buscar ",  " busca ", " comer ai ", " come ai ", " pegar ", " pega " , " eu vou ai ", " ja esta indo ", " ja ta indo ", " já pra ir " ];
+    var PalEntrega = [" buscar ",  " busca ", " comer ai ", " come ai ", " pegar ", " pega " , " eu vou ai ", " ja esta indo ", " ja ta indo ", " já pra ir ", " retirada ", " retirar ",  " retira " ];
     var PalDemora = ["demora", "tempo", "minutos", "minuto", "duração", "duracao" ]
     var PalNum1 = ["1", "um", "uma"]
     var PalNum2 = ["2", "duas", "dois"]
@@ -20,9 +21,9 @@ const TamanhoMsg =  require("./Tamanhomsg");
     var PalDinheiro = ["dinheiro", "dinhero", "pagar aqui", "paga aqui", "pg aqui", "troco", "trocado", "em mãos", "em maos", "em mao",  "em mão", "em especie", "em espesie", "em espessie", "em espécie"]
     var PalCartao = ["maquininha", "cartao", "cartão", "maquina", "máquina", "credito", "crédito", "debito", "débito", "cedito", "cédito"]
     var PalEnd = [" numero ", " n° ", " n ", " rua ", " casa ", " ginásio ", " ginasio ", " muro ", " bar ", " em frente ", " enfrente ", " frente ", " lado ", " endereço ", " endereco ", " portao ", " portão ", " assentamento ", " porta ", " travessa ", " beco ", " aqui no ", " posto ", " pousada ", " hotel ", " motel ", " quarto ", " esquina ", " no fundo ", " placa ", " canto ", " lado ", " loja ", " bairro ", " creche ", " torre ", " caixa dagua ", " caixa de agua ", " escola ", " faculdade ", 
-      " salão ", " salao ", " deposito ", " grade ", " perto da ", " prefeitura ", " proximo  ", " próximo ", " aqui no ", " quadra ", " ap ", " apartamento ", " sentados ", " avenida ", " restaurante ", " antigo ", " armarinho ", " armarínho ", " comecial ", " marcenaria ", " praça ", " br ", " casa ", " residencial ", " edificio ", " edifício ", " predio ", " prédio ", " balcão ", " palcão ", " malharia " ]
+      " salão ", " salao ", " deposito ", " grade ", " perto da ", " prefeitura ", " proximo ", " próximo ", " aqui no ", " quadra ", " ap ", " apartamento ", " sentados ", " avenida ", " restaurante ", " antigo ", " armarinho ", " armarínho ", " comecial ", " marcenaria ", " praça ", " br ", " casa ", " residencial ", " edificio ", " edifício ", " predio ", " prédio ", " balcão ", " palcão ", " malharia " ]
       var PalProximo = [" Ponto de Referência ", " Ponto de Referencia ", " casa ", " ginásio ", " ginasio ", " muro ", " bar ", " em frente ", " enfrente ", " frente ", " lado ",  " portao ", " portão ",  " porta ", " beco ",  " posto ", " pousada ", " hotel ", " motel ", " quarto ", " esquina ", " no fundo ", " placa ", " canto ", " lado ", " loja ",  " creche ", " torre ", " caixa dagua ", " caixa de agua ", " escola ", " faculdade ", 
-      " salão ", " salao ", " deposito ", " grade ", " perto da ", " prefeitura ", " proximo  ", " próximo ",    " restaurante ", " antigo ", " armarinho ", " armarínho ", " comecial ", " marcenaria ", " praça ", " br ", " casa ", " residencial ", " edificio ", " edifício ", " predio ", " prédio ", " balcão ", " palcão ", " malharia " ]
+      " salão ", " salao ", " deposito ", " grade ", " perto da ", " prefeitura ", "proximo", "próximo",    " restaurante ", " antigo ", " armarinho ", " armarínho ", " comecial ", " marcenaria ", " praça ", " br ", " casa ", " residencial ", " edificio ", " edifício ", " predio ", " prédio ", " balcão ", " palcão ", " malharia " ]
     
     var ListaItens = ItensMenus;
     var ItensPedido = []
@@ -47,12 +48,14 @@ const TamanhoMsg =  require("./Tamanhomsg");
     var Desati = false;
     var AnaliEnd= true;
     var Buscar = false;
+    var SessaoG = "";
 
-    console.log("Msg Chegou "+Msg1)
+    // console.log("Msg Chegou " + Msg1)
+    //  console.log("Msg Chegou 2 "+Msg)
     
     for (let z=0; z<4; z++) {//Procurando Itens Loop Inicio
                                  
-                                 
+                      
         var QuantSessao = 1;
      
        var PrecoPre = false;
@@ -83,6 +86,9 @@ const TamanhoMsg =  require("./Tamanhomsg");
         var MemFim = false;
        
         var Nota = {};
+      var  AtiEspeci = false
+        var  GrupEspe = []
+        var Especifico = "";
        
         var VerMen = {
           Date:0,
@@ -162,7 +168,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
               var QuantRepet = 0;
                               for(let i in ItensMenus){
                                   for(let j in ItensMenus[i].TagsMenus){
-                                    TagMModi =" "+ItensMenus[i].TagsMenus[j].toLowerCase()+" ";
+                                    TagMModi =" "+ItensMenus[i].TagsMenus[j].trim().toLowerCase()+" ";
                                      
                                       
                                       if(TagMModi !== "" && TagMModi !== " " && TagMModi !== "  " && TagMModi !== "   "){
@@ -178,13 +184,14 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                     //     const regex = new RegExp(TagMModi, "g");
                                     //     QuantRepet = (Msg1.match(regex) || []).length
                                         
-                                    //   if(QuantRepet > 1){
+                                     if(PedidoDupSes == false){
+                                       // console.log("Entrado no Duplo sessa")
                                       for(let g in ItensPedido){
                                           if(ItensPedido[g].Sessao === ItensMenus[i].Sessao){
                                               PodeSessao = false; 
                                           }
                                       }
-                                    // }   
+                                     }   
 
                                          if(PodeSessao){
 
@@ -219,7 +226,10 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                           SessaoGuar = ItensMenus[i].Sessao;
                                           AtiSessao = ItensMenus[i].AtivoSessao;
                                           ItemComTam = ItensMenus[i].ComTam;
-                                          MemFim =ItensMenus[i].MemFim; 
+                                          MemFim = ItensMenus[i].MemFim; 
+                                          AtiEspeci = ItensMenus[i].AtiEspeci;
+                                          GrupEspe = ItensMenus[i].GrupEspe;
+                                          Especifico = ItensMenus[i].Especifico;
                                           }
                                       } 
                                       }
@@ -232,18 +242,33 @@ const TamanhoMsg =  require("./Tamanhomsg");
                               }
 
                               //Essa funçção serve para o sabor não cair em uma sessão diferente
-                              var DadoFuncao = ConsMsg(Msg, ItensMenus, DadoEmp) 
-                             // console.log(DadoFuncao)
+                              var DadoFuncao = ConsMsg(Msg, ItensMenus, DadoEmp, PedidoDupSes) 
+
                               var MsgEdiPos = "";
                               for(let f in DadoFuncao.ItensPedido){
                                 if(DadoFuncao.ItensPedido.length > 1){
                                 if(f > 0){
 
+                                    
                               
-                                var Antes = Msg.indexOf(TagMtira)
-                                var MsgEdiAntes = Msg.slice(Antes)
-                                var Pos = MsgEdiAntes.indexOf(DadoFuncao.ItensPedido[f].NomeDigi)
-                                 MsgEdiPos = MsgEdiAntes.slice(0, Pos)
+                                if(DadoFuncao.ItensPedido[f].NomeDigi === TagMtira){
+                           
+                                    var Antes = Msg.indexOf(TagMtira)
+                                    var MsgEdiAntes = Msg.slice(Antes)
+                                    var Pos = MsgEdiAntes.indexOf(DadoFuncao.ItensPedido[f].NomeDigi, 2)
+                                    //Ficar do 0 até outra sessão
+                                     MsgEdiPos = MsgEdiAntes.slice(0, Pos)
+
+                                } else {
+                                
+                                    var Antes = Msg.indexOf(TagMtira)
+                                    var MsgEdiAntes = Msg.slice(Antes)
+                                    var Pos = MsgEdiAntes.indexOf(DadoFuncao.ItensPedido[f].NomeDigi)
+                                    //Ficar do 0 até outra sessão
+                                     MsgEdiPos = MsgEdiAntes.slice(0, Pos)
+
+                               }
+                           
                              
                                 
                                  }
@@ -256,7 +281,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                               }
                              //Mensagem pronta ´para anali
                               MsgEdiPos = " "+MsgEdiPos+" "
-                             // console.log("Msg Edi"+MsgEdiPos)
+                              console.log("Msg Edi"+MsgEdiPos)
 
 
 
@@ -273,7 +298,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                     var NotTamanho = ""
                                     var TagTModi = ""
                                     var TagTTirar   
-                                 var FuncaoTamanho = TamanhoMsg(GrupSessao, MsgEdiPos, Msg,  QuantSessao, DadoEmp) 
+                                 var FuncaoTamanho = TamanhoMsg(Especifico, GrupEspe,  AtiEspeci, GrupSessao, MsgEdiPos, Msg,  QuantSessao, DadoEmp) 
 
                                  NotTamanho = FuncaoTamanho.NotTamanho ;
                                  TamanhoNome = FuncaoTamanho.TamanhoNome ;
@@ -299,97 +324,13 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                MsgEdiPos = FuncaoTamanho.MsgEdiPos;
                                   Msg = Msg.replace(TagTTirar, "  ")
                                   Msg = Msg.replace(TagTTirar2, "  ")
-                                  // console.log(Msg)
-                                  // console.log(NotTamanho)
-                            console.log("Msg Analmesg "+MsgEdiPos)
                                
-
-                                //   if(DigiTamanho === false){ //digitou sessão e Sabor
-
-                                //       var NotSabor = true;
-                                //       var TagIMode = "";
-                                //       var TagITirar = []
-                                      
-                                //       for(let i in GrupSessao){
-                                //           for(let j in GrupSessao[i].TagsItens){
-                                //               TagIMode =" "+ GrupSessao[i].TagsItens[j].toLowerCase()+" "
-                                //               // console.log("Conb: "+TagIMode)
-                                //               // console.log("Sessao "+Msg)
-                                //               if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
-                                //                  // console.log("Achou uma 1")
-                                //                  if(MsgEdiPos.includes(TagIMode)){
-                                //                   //console.log("Achou uma 2")
-                                //                   if(GrupSessao[i].AtivoSabor){
-                                //                   if(DigiSabor === false){
-                                //                       if( GrupSessao[i].AtivoSabor){
-                                //                           if(TagITirar.includes(TagIMode)=== false){
-                                //                               TagITirar.push(TagIMode)
-                                //                           }
-
-                                //                           GrupSabor.push(GrupSessao[i])
-                                //                           DigiSabor = true;
-                                //                           AtiSabor = GrupSessao[i].AtivoSabor;
-                                //                           VerMen={
-                                //                               Nome:[GrupSessao[i].Nome],
-                                //                               Descricao:[GrupSessao[i].Descricao],
-                                //                               Foto:[GrupSessao[i].foto],
-                                //                               Preco:0,
-                                //                               Descont:0,
-                                //                               SubSessao:"",
-                                //                               Quant:1,
-                                //                               Observacao:"",
-                                //                               ItemEspeci:false,
-                                //                               QuantGeral:1,
-                                //                               Sessao:GrupSessao[i].Sessao,
-                                //                               MemFim:GrupSessao[i].MemFim,
-                                //                               QuantSb:GrupSessao[i].QuantSb,
-                                //                               ItemComTam:GrupSessao[i].ComTam,
-
-                                //                           }
-
-                                //                       }
-                                                  
-
-                                                  
-
-                                //               } 
-                                //                   } else {
-                                //                       if(SaborIndis.includes(GrupSessao[i].Nome)=== false ){
-                                //                           SaborIndis.push(GrupSessao[i].Nome);
-                                //                       }
-                                //                   DigiSabor = true;
-                                //                   AtiSabor = false;
-                                //                   }
-                                                      
-
-                                                      
-                                                  
-                                              
-                                              
-                                //               }
-                                //           }
-
-                                          
-                                          
-
-                                              
-                                              
-
-                                //           }
-                                          
-                                //       }
-                                //       for(let d in TagITirar){
-                                //       Msg = Msg.replace(TagITirar[d], "  ")
-                                //       }
-                                //       // console.log(TagITirar)
-                                //       // console.log("Msg 3 "+Msg)
-
-                                //   }
+                             
                                 
                                 if(DigiTamanho === false){
                                     if(QuantSessao === 1){//vendo se digitou o sabor com 1 item
-                                      console.log("entrou por aqui nessa região")
-                                      console.log("Texto "+MsgEdiPos)
+                                    //   console.log("entrou por aqui nessa região")
+                                    //   console.log("Texto "+MsgEdiPos)
                                             var ListSabor = [];
                                             var ListDescr = [];
                                             var ListFoto = []; 
@@ -399,7 +340,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                             
                                                 for(let i in GrupSessao){
                                                     for(let j in GrupSessao[i].TagsItens){
-                                                      TagIMode =" "+ GrupSessao[i].TagsItens[j].toLowerCase()+" "
+                                                      TagIMode =" "+ GrupSessao[i].TagsItens[j].trim().toLowerCase()+" "
                                                         
                                                         if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                      
@@ -519,13 +460,13 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                       
                                                           for(let i in GrupSessao){
                                                               for(let j in GrupSessao[i].TagsItens){
-                                                                TagIMode =" "+ GrupSessao[i].TagsItens[j].toLowerCase()+" "
+                                                                TagIMode =" "+ GrupSessao[i].TagsItens[j].trim().toLowerCase()+" "
                                                                   
                                                                   if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                                      
                                                                       if(NomeSabores1.includes(TagIMode)){
                                                                     
-                                                                          console.log("Sabores 1 vendo "+NomeSabores1)
+                                                                      //    console.log("Sabores 1 vendo "+NomeSabores1)
                                                                       
                                                                       if(ListSabor.length < 3){
                                                                           
@@ -595,12 +536,12 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                           
                                                               for(let i in GrupSessao){
                                                                   for(let j in GrupSessao[i].TagsItens){
-                                                                    TagIMode =" "+ GrupSessao[i].TagsItens[j].toLowerCase()+" "
+                                                                    TagIMode =" "+ GrupSessao[i].TagsItens[j].trim().toLowerCase()+" "
                                                                       
                                                                       if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                                     
                                                                           if(NomeSabores2.includes(TagIMode)){
-                                                                              console.log("Sabores 2 vendo "+NomeSabores2)
+
                                                                          
                                                                           
                                                                           if(ListSabor.length < 3){
@@ -662,7 +603,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                                   }
                                                                   
                                                               }
-                                                           console.log("Aqui ja chegou 2 sabores")
+                                                      
                                                           for(let d in TagITirar){
                                                           Msg = Msg.replace(TagITirar[d], "  ")
                                                           MsgEdiPos = MsgEdiPos.replace(TagITirar[d], "  ")
@@ -681,7 +622,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                               
                                                   for(let i in GrupSessao){
                                                       for(let j in GrupSessao[i].TagsItens){
-                                                        TagIMode =" "+ GrupSessao[i].TagsItens[j].toLowerCase()+" "
+                                                        TagIMode =" "+ GrupSessao[i].TagsItens[j].trim().toLowerCase()+" "
                                                           
                                                           if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                        
@@ -765,17 +706,20 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                         var ListFoto = []; 
                                         var TagIMode = "";
                                         var TagITirar = []
-                                        //console.log(GrupTamanho)
+                                     
                                         
                                             for(let i in GrupTamanho){
                                                 for(let j in GrupTamanho[i].TagsItens){
-                                                  TagIMode =" "+ GrupTamanho[i].TagsItens[j].toLowerCase()+" "
+
+                                                    
+                                                  TagIMode =" "+ GrupTamanho[i].TagsItens[j].trim().toLowerCase()+" "
                                                     
                                                     if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
-                                                 
+                                                         console.log("MsgEdiPos "+MsgEdiPos)
+                                                         console.log("TagIMode "+TagIMode)
                                                         if(MsgEdiPos.includes(TagIMode)){
                                                       
-                                                       
+                                                            console.log("Vendo o Sabor ")
                                                         
                                                         if(ListSabor.length < QuantSabor){
                                                             
@@ -889,7 +833,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                               
                                                   for(let i in GrupTamanho){
                                                       for(let j in GrupTamanho[i].TagsItens){
-                                                        TagIMode =" "+ GrupTamanho[i].TagsItens[j].toLowerCase()+" "
+                                                        TagIMode =" "+ GrupTamanho[i].TagsItens[j].trim().toLowerCase()+" "
                                                           
                                                           if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                              
@@ -965,7 +909,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                   
                                                       for(let i in GrupTamanho2){
                                                           for(let j in GrupTamanho2[i].TagsItens){
-                                                            TagIMode =" "+ GrupTamanho2[i].TagsItens[j].toLowerCase()+" "
+                                                            TagIMode =" "+ GrupTamanho2[i].TagsItens[j].trim().toLowerCase()+" "
                                                               
                                                               if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                             
@@ -1049,13 +993,13 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                   
                                                       for(let i in GrupTamanho){
                                                           for(let j in GrupTamanho[i].TagsItens){
-                                                            TagIMode =" "+ GrupTamanho[i].TagsItens[j].toLowerCase()+" "
+                                                            TagIMode =" "+ GrupTamanho[i].TagsItens[j].trim().toLowerCase()+" "
                                                               
                                                               if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                                  
                                                                   if(NomeSabores1.includes(TagIMode)){
                                                                 
-                                                                      console.log("Sabores 1 vendo "+NomeSabores1)
+                                                                
                                                                   
                                                                   if(ListSabor.length < QuantSabor){
                                                                       
@@ -1125,12 +1069,12 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                       
                                                           for(let i in GrupTamanho){
                                                               for(let j in GrupTamanho[i].TagsItens){
-                                                                TagIMode =" "+ GrupTamanho[i].TagsItens[j].toLowerCase()+" "
+                                                                TagIMode =" "+ GrupTamanho[i].TagsItens[j].trim().toLowerCase()+" "
                                                                   
                                                                   if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                                 
                                                                       if(NomeSabores2.includes(TagIMode)){
-                                                                          console.log("Sabores 2 vendo "+NomeSabores2)
+                                                                     
                                                                      
                                                                       
                                                                       if(ListSabor.length < QuantSabor){
@@ -1192,7 +1136,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                               }
                                                               
                                                           }
-                                                       console.log("Aqui ja chegou 2 sabores")
+                                                    
                                                       for(let d in TagITirar){
                                                       Msg = Msg.replace(TagITirar[d], "  ")
                                                       MsgEdiPos = MsgEdiPos.replace(TagITirar[d], "  ")
@@ -1211,7 +1155,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                           
                                               for(let i in GrupTamanho){
                                                   for(let j in GrupTamanho[i].TagsItens){
-                                                    TagIMode =" "+ GrupTamanho[i].TagsItens[j].toLowerCase()+" "
+                                                    TagIMode =" "+ GrupTamanho[i].TagsItens[j].trim().toLowerCase()+" "
                                                       
                                                       if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                    
@@ -1287,7 +1231,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                               
                                                   for(let i in GrupTamanho2){
                                                       for(let j in GrupTamanho2[i].TagsItens){
-                                                        TagIMode =" "+ GrupTamanho2[i].TagsItens[j].toLowerCase()+" "
+                                                        TagIMode =" "+ GrupTamanho2[i].TagsItens[j].trim().toLowerCase()+" "
                                                           
                                                           if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                        
@@ -1389,7 +1333,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                      // console.log("Entrou Em Sem Tamanho 1")
                                       for(let i in GrupSessao){
                                           for(let j in GrupSessao[i].TagsItens){
-                                              TagIMode =" "+ GrupSessao[i].TagsItens[j].toLowerCase()+" "
+                                              TagIMode =" "+ GrupSessao[i].TagsItens[j].trim().toLowerCase()+" "
                                               
                                               if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                 // console.log("Conb: "+TagIMode)
@@ -1464,7 +1408,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                      // console.log("Entrou Em Sem Tamanho 1")
                                       for(let i in GrupSessao){
                                           for(let j in GrupSessao[i].TagsItens){
-                                              TagIMode =" "+ GrupSessao[i].TagsItens[j].toLowerCase()+" "
+                                              TagIMode =" "+ GrupSessao[i].TagsItens[j].trim().toLowerCase()+" "
                                               
                                               if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                 // console.log("Conb: "+TagIMode)
@@ -1540,7 +1484,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                        //  console.log("Entrou Em MemFim 1")
                                           for(let i in GrupSessao){
                                               for(let j in GrupSessao[i].TagsItens){
-                                                  TagIMode =GrupSessao[i].TagsItens[j].toLowerCase()
+                                                  TagIMode =GrupSessao[i].TagsItens[j].trim().toLowerCase()
                                                   // console.log("Conb: "+TagIMode)
                                                   // console.log("Sessao "+Msg)
                                                   if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
@@ -1618,7 +1562,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                        // console.log("Entrou Em Sem Tamanho 1")
                                         for(let i in GrupSessao){
                                             for(let j in GrupSessao[i].TagsItens){
-                                                TagIMode =" "+ GrupSessao[i].TagsItens[j].toLowerCase()+" "
+                                                TagIMode =" "+ GrupSessao[i].TagsItens[j].trim().toLowerCase()+" "
                                                 
                                                 if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                                   // console.log("Conb: "+TagIMode)
@@ -1771,37 +1715,44 @@ const TamanhoMsg =  require("./Tamanhomsg");
                             
 
                               } else {//se Digitou o tamanho e sabor
-                                  console.log("Entrando no sem tamanho")
+                                
 
-                                  // console.log("Entrou Aqui no tamanho Agoras")   
                               
                                   var NotTamanho = ""
                                   var Desa25=false;
                                   var TagTModi = ""
                                   var TagTTirar = ""
+                                  var Pass1 = false;
                                   //Digitou Tamanho 
                                   for(let i in ItensMenus){
                                       if(Desa25 === false){
                                           
                                   for(let j in ItensMenus[i].TagsTamanhos){
                                       TagTModi =" "+ItensMenus[i].TagsTamanhos[j].toLowerCase()+" ";
-                                      // console.log("Conb: "+DivNome4[j])
-                                      // console.log("Sessao "+ItensMenus[i].body.toLowerCase())
+                                   
                                       if(TagTModi !== "" && TagTModi !== " " && TagTModi !== "  "){
+                                    
+                                       
                                           if(Msg.includes(TagTModi)){
-                                          Desa25 = true;
+                                         // Desa25 = true;
                                           SessaoGuar = ItensMenus[i].Sessao;
-                                          if(Msg.toLowerCase().includes(Borda)){
-                                          
-                                              if(ItensMenus[i].Tamanho.toLowerCase().includes(Borda)){
-                                                  
+                                         var Mar = "";
+                                         var Mar2 = ""
+                                          for(let l in ItensMenus[i].GrupEspe){
+                                            Mar = ItensMenus[i].GrupEspe[l].toLowerCase()
+                                          if(Msg.toLowerCase().includes(Mar)){
+                                            Mar2 = ItensMenus[i].Especifico.toLowerCase()
+                                              if(ItensMenus[i].Tamanho.toLowerCase().includes(Mar2)){
+                                                //console.log("Entrou no Com borda ")
+                                                if(ItensMenus[i].AtivoTamanho) {
                                                   if(NotTamanho){
                                                       if(NotTamanho === ItensMenus[i].Tamanho){
+                                                        Pass1 = true;
                                                           QuantSabor= ItensMenus[i].QuantSb
                                                           GrupTamanho.push(ItensMenus[i])
-                                                          DigiTamanho = true;
+                                                         // DigiTamanho = true;
                                                           DigiSessao = true;
-                                                          AtiTamanho = ItensMenus[i].AtivoTamanho;
+                                                         // AtiTamanho = ItensMenus[i].AtivoTamanho;
                                                         
                                                           VerMen={
                                                               Nome:[],
@@ -1825,6 +1776,8 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                       }
 
                                                   } else {
+                                                  
+                                                    Pass1 = true;
                                                       TamanhoNome = ItensMenus[i].Tamanho;
                                                       AtiSessao = ItensMenus[i].AtivoSessao;
                                                       TagTTirar = TagTModi;
@@ -1856,79 +1809,48 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                   
 
                                                   }
-                                              
-
-                                              }
-                                          
-                                          } else {
-                                              
-                                              
-                                              if(ItensMenus[i].Tamanho.toLowerCase().includes(Borda) === false){
-                                              
-                                                  if(NotTamanho){
-                                                      if(NotTamanho === ItensMenus[i].Tamanho){
-                                                          QuantSabor= ItensMenus[i].QuantSb
-                                                          GrupTamanho.push(ItensMenus[i])
-                                                          DigiTamanho = true;
-                                                          DigiSessao = true
-                                                          AtiTamanho = ItensMenus[i].AtivoTamanho;
-                                                          
-                                                          VerMen={
-                                                              Nome:[],
-                                                              Descricao:[],
-                                                              Foto:[],
-                                                              Preco:ItensMenus[i].Preco,
-                                                              Descont:ItensMenus[i].Descont,
-                                                              SubSessao:ItensMenus[i].AtivoTamanho?ItensMenus[i].Tamanho:"",
-                                                              Quant:1,
-                                                              Observacao:"",
-                                                              ItemEspeci:false,
-                                                              QuantGeral:1,
-                                                              Sessao:ItensMenus[i].Sessao,
-                                                              ItemComTam:ItensMenus[i].ComTam,
-                                                              MemFim:ItensMenus[i].MemFim,
-                                                              QuantSb:ItensMenus[i].QuantSb
-                                                          }
-                                                      
-
-                                                      }
-
-                                                  } else {
+                                                } else {
+                                                    if(NotTamanho){
+                                                     
+                                                    } else {
+                                                  
+                                                     Pass1 = true;
+                                                     // tanhanho = true;
+                                                     TamanhoNome = ItensMenus[i].Tamanho;
+                                                      AtiSessao = ItensMenus[i].AtivoSessao;
                                                       TagTTirar = TagTModi;
                                                       QuantSabor= ItensMenus[i].QuantSb
                                                       NotTamanho = ItensMenus[i].Tamanho
                                                       GrupTamanho.push(ItensMenus[i])
                                                       DigiTamanho = true;
                                                       DigiSessao = true;
-                                                      TamanhoNome = ItensMenus[i].Tamanho;
-                                                      AtiSessao=ItensMenus[i].AtivoSessao;
-                                                      AtiTamanho = ItensMenus[i].AtivoTamanho;
                                                       SessaoGuar =ItensMenus[i].Sessao;
+                                                      AtiTamanho = ItensMenus[i].AtivoTamanho;
                                                       ItemComTam = ItensMenus[i].ComTam;
+                                    
                                                       VerMen={
-                                                          Nome:[],
-                                                          Descricao:[],
-                                                          Foto:[],
-                                                          Preco:ItensMenus[i].Preco,
-                                                          Descont:ItensMenus[i].Descont,
-                                                          SubSessao:ItensMenus[i].AtivoTamanho?ItensMenus[i].Tamanho:"",
-                                                          Quant:1,
-                                                          Observacao:"",
-                                                          ItemEspeci:false,
-                                                          QuantGeral:1,
-                                                          Sessao:ItensMenus[i].Sessao,
-                                                          ItemComTam:ItensMenus[i].ComTam,
-                                                          MemFim:ItensMenus[i].MemFim,
-                                                          QuantSb:ItensMenus[i].QuantSb
+                                                        Date:new Date().getTime()+4000,
+                                                        Descont:0,
+                                                        Descricao:[],
+                                                        Foto:[],
+                                                        ItemEspeci:true,
+                                                        Nome:[],
+                                                        Preco:0,
+                                                        Quant:1,
+                                                        Sessao:ItensMenus[i].Sessao,
+                                                        SubSessao:"",
+                                                        MemFim:ItensMenus[i].MemFim,
+                                                        ItemComTam:ItensMenus[i].ComTam,
+                                                        QuantSb:1
                                                       }
-                                                  
-
+                                                    }
                                                   }
-                                              
 
                                               }
-                                      
-                                          }
+                                          
+                                          } 
+                                            }
+                                          
                                           // if(Desa25){ 
                                           //   if(ItensMenus[i].AtivoTamanho) { 
                                           // } else{
@@ -1949,11 +1871,230 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                   }
                                   }
                                   }
-                                  Msg = Msg.replace(TagTTirar, "  ")
-                                //   console.log(Msg)
-                                //   console.log(NotTamanho)
+                                 
+                                  if(Pass1 === false){
 
-                             
+                                    for(let i in ItensMenus){
+                                        if(Desa25 === false){
+                                            
+                                    for(let j in ItensMenus[i].TagsTamanhos){
+                                        TagTModi =" "+ItensMenus[i].TagsTamanhos[j].toLowerCase()+" ";
+                                        // console.log("Conb: "+DivNome4[j])
+                                        // console.log("Sessao "+ItensMenus[i].body.toLowerCase())
+                                        if(TagTModi !== "" && TagTModi !== " " && TagTModi !== "  "){
+                                        // ItensMenus[i].AtiEspeci;
+                                        //   GrupEspe = ItensMenus[i].GrupEspe;
+                                        //   Especifico = ItensMenus[i].Especifico;
+                                        
+                                            if(Msg.includes(TagTModi)){
+                                        // Desa25 = true;
+                                            SessaoGuar = ItensMenus[i].Sessao;
+                                            var Mer3 = ""
+                                           
+                                            // console.log("Base Especific "+ItensMenus[i].AtiEspeci)
+                                            // console.log("Nome "+ ItensMenus[i].Tamanho)
+                                                
+                                              
+                                            Mar3 = ItensMenus[i].Especifico.toLowerCase()
+                                            if(ItensMenus[i].AtiEspeci){
+                                            if(ItensMenus[i].Tamanho.toLowerCase().includes(Mar3) === false){
+                                             
+                                                if(ItensMenus[i].AtivoTamanho) {
+                                                    if(NotTamanho){
+                                                        if(NotTamanho === ItensMenus[i].Tamanho){
+                                                            QuantSabor= ItensMenus[i].QuantSb
+                                                            GrupTamanho.push(ItensMenus[i])
+                                                            //DigiTamanho = true;
+                                                            DigiSessao = true
+                                                        // AtiTamanho = ItensMenus[i].AtivoTamanho;
+                                                            
+                                                            VerMen={
+                                                                Nome:[],
+                                                                Descricao:[],
+                                                                Foto:[],
+                                                                Preco:ItensMenus[i].Preco,
+                                                                Descont:ItensMenus[i].Descont,
+                                                                SubSessao:ItensMenus[i].AtivoTamanho?ItensMenus[i].Tamanho:"",
+                                                                Quant:1,
+                                                                Observacao:"",
+                                                                ItemEspeci:false,
+                                                                QuantGeral:1,
+                                                                Sessao:ItensMenus[i].Sessao,
+                                                                ItemComTam:ItensMenus[i].ComTam,
+                                                                MemFim:ItensMenus[i].MemFim,
+                                                                QuantSb:ItensMenus[i].QuantSb
+                                                            }
+                                                        
+
+                                                        }
+
+                                                    } else {
+                                                    console.log("entrou no tamanho ok")
+                                                        TagTTirar = TagTModi;
+                                                        QuantSabor= ItensMenus[i].QuantSb
+                                                        NotTamanho = ItensMenus[i].Tamanho
+                                                        GrupTamanho.push(ItensMenus[i])
+                                                        DigiTamanho = true;
+                                                        DigiSessao = true;
+                                                        TamanhoNome = ItensMenus[i].Tamanho;
+                                                        AtiSessao=ItensMenus[i].AtivoSessao;
+                                                        AtiTamanho = ItensMenus[i].AtivoTamanho;
+                                                        SessaoGuar =ItensMenus[i].Sessao;
+                                                        ItemComTam = ItensMenus[i].ComTam;
+                                                        VerMen={
+                                                            Nome:[],
+                                                            Descricao:[],
+                                                            Foto:[],
+                                                            Preco:ItensMenus[i].Preco,
+                                                            Descont:ItensMenus[i].Descont,
+                                                            SubSessao:ItensMenus[i].AtivoTamanho?ItensMenus[i].Tamanho:"",
+                                                            Quant:1,
+                                                            Observacao:"",
+                                                            ItemEspeci:false,
+                                                            QuantGeral:1,
+                                                            Sessao:ItensMenus[i].Sessao,
+                                                            ItemComTam:ItensMenus[i].ComTam,
+                                                            MemFim:ItensMenus[i].MemFim,
+                                                            QuantSb:ItensMenus[i].QuantSb
+                                                        }
+                                                    
+
+                                                    }
+                                                } else {
+                                                    if(NotTamanho){
+                                                     
+                                                    } else {
+                                                    console.log("Entrou no Tamanho desativado")  
+                                                     Pass1 = true;
+                                                     // tanhanho = true;
+                                                     TamanhoNome = ItensMenus[i].Tamanho;
+                                                      AtiSessao = ItensMenus[i].AtivoSessao;
+                                                      TagTTirar = TagTModi;
+                                                      QuantSabor= ItensMenus[i].QuantSb
+                                                      NotTamanho = ItensMenus[i].Tamanho
+                                                      GrupTamanho.push(ItensMenus[i])
+                                                      DigiTamanho = true;
+                                                      DigiSessao = true;
+                                                      SessaoGuar =ItensMenus[i].Sessao;
+                                                      AtiTamanho = ItensMenus[i].AtivoTamanho;
+                                                      ItemComTam = ItensMenus[i].ComTam;
+                                    
+                                                      VerMen={
+                                                        Date:new Date().getTime()+4000,
+                                                        Descont:0,
+                                                        Descricao:[],
+                                                        Foto:[],
+                                                        ItemEspeci:true,
+                                                        Nome:[],
+                                                        Preco:0,
+                                                        Quant:1,
+                                                        Sessao:ItensMenus[i].Sessao,
+                                                        SubSessao:"",
+                                                        MemFim:ItensMenus[i].MemFim,
+                                                        ItemComTam:ItensMenus[i].ComTam,
+                                                        QuantSb:1
+                                                      }
+                                                    }
+                                                  }
+                                                
+
+                                                }
+                                            } else {
+                                             
+                                             
+                                                        if(NotTamanho){
+                                                            if(NotTamanho === ItensMenus[i].Tamanho){
+                                                                QuantSabor= ItensMenus[i].QuantSb
+                                                                GrupTamanho.push(ItensMenus[i])
+                                                                //DigiTamanho = true;
+                                                                DigiSessao = true
+                                                            // AtiTamanho = ItensMenus[i].AtivoTamanho;
+                                                                
+                                                                VerMen={
+                                                                    Nome:[],
+                                                                    Descricao:[],
+                                                                    Foto:[],
+                                                                    Preco:ItensMenus[i].Preco,
+                                                                    Descont:ItensMenus[i].Descont,
+                                                                    SubSessao:ItensMenus[i].AtivoTamanho?ItensMenus[i].Tamanho:"",
+                                                                    Quant:1,
+                                                                    Observacao:"",
+                                                                    ItemEspeci:false,
+                                                                    QuantGeral:1,
+                                                                    Sessao:ItensMenus[i].Sessao,
+                                                                    ItemComTam:ItensMenus[i].ComTam,
+                                                                    MemFim:ItensMenus[i].MemFim,
+                                                                    QuantSb:ItensMenus[i].QuantSb
+                                                                }
+                                                            
+    
+                                                            }
+    
+                                                        } else {
+                                                        console.log("entrou no tamanho ok")
+                                                            TagTTirar = TagTModi;
+                                                            QuantSabor= ItensMenus[i].QuantSb
+                                                            NotTamanho = ItensMenus[i].Tamanho
+                                                            GrupTamanho.push(ItensMenus[i])
+                                                            DigiTamanho = true;
+                                                            DigiSessao = true;
+                                                            TamanhoNome = ItensMenus[i].Tamanho;
+                                                            AtiSessao=ItensMenus[i].AtivoSessao;
+                                                            AtiTamanho = ItensMenus[i].AtivoTamanho;
+                                                            SessaoGuar =ItensMenus[i].Sessao;
+                                                            ItemComTam = ItensMenus[i].ComTam;
+                                                            VerMen={
+                                                                Nome:[],
+                                                                Descricao:[],
+                                                                Foto:[],
+                                                                Preco:ItensMenus[i].Preco,
+                                                                Descont:ItensMenus[i].Descont,
+                                                                SubSessao:ItensMenus[i].AtivoTamanho?ItensMenus[i].Tamanho:"",
+                                                                Quant:1,
+                                                                Observacao:"",
+                                                                ItemEspeci:false,
+                                                                QuantGeral:1,
+                                                                Sessao:ItensMenus[i].Sessao,
+                                                                ItemComTam:ItensMenus[i].ComTam,
+                                                                MemFim:ItensMenus[i].MemFim,
+                                                                QuantSb:ItensMenus[i].QuantSb
+                                                            }
+                                                        
+    
+                                                        }
+                                                    
+    
+                                                    
+                                            }
+                                        
+                                            
+                                            
+                                            // if(Desa25){ 
+                                            //   if(ItensMenus[i].AtivoTamanho) { 
+                                            // } else{
+
+                                            // }
+                                            // }
+                                            
+                                            
+                                        } 
+                                    }
+
+                                        
+                                        
+
+                                        
+                                        
+
+                                    }
+                                    }
+                                    }
+                                 }
+                                  Msg = Msg.replace(TagTTirar, "  ")
+                                //   console.log("DigiTamanho "+DigiTamanho)
+                               // console.log("Ver a Msg  "+Msg)
+
+                                 // console.log(GrupTamanho)
                                   
                               if(DigiTamanho &&  AtiTamanho){
                                   var ListSabor = [];
@@ -1965,10 +2106,10 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                   for(let i in GrupTamanho){
                                       for(let j in GrupTamanho[i].TagsItens){
                                           TagIMode =" "+ GrupTamanho[i].TagsItens[j].toLowerCase()+" "
-                                              // console.log("Conb: "+DivNome4[j])
-                                              // console.log("Sessao "+GrupTamanho[i].Nome.toLowerCase())
+                                             
                                               if(TagIMode !== "" && TagIMode !== " " && TagIMode !== "  " && TagIMode !== "   "){
                                               if(Msg.includes(TagIMode)){
+                                                console.log("entrou no sabor ok "+ QuantSabor)
                                                   if(ListSabor.length < QuantSabor){
                                                       if(ListSabor.includes(GrupTamanho[i].Nome)=== false){
                                                             
@@ -1976,6 +2117,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                                                               if(TagITirar.includes(TagIMode)=== false){
                                                                   TagITirar.push(TagIMode)
                                                               }
+                                                              console.log("entrou no sabor ok")
                                                           ListSabor.push(GrupTamanho[i].Nome)
                                                           ListDescr.push(GrupTamanho[i].Descricao)
                                                           ListFoto.push(GrupTamanho[i].foto)
@@ -2173,6 +2315,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
 
          
               if(ItemComTam){
+                var SessaoG = SessaoGuar;
                Variaveis = [{id:0, body:`🗂️ *Esse São os Preços e Tamanhos diponíveis ${SessaoGuar}* \n===================`}];
                var AnliVari = [];
 
@@ -2210,7 +2353,7 @@ const TamanhoMsg =  require("./Tamanhomsg");
                }
 
               } else {
-
+                var SessaoG = SessaoGuar;
                var Variaveis = [{id:0, body:`🗂️ *Esse São os Preços e Sabores diponíveis ${SessaoGuar}* \n===================`}];
                var AnliVari = [];
 
@@ -2598,11 +2741,11 @@ var PagDinheiro = "";
       
                     }  
             
-
+          console.log(" Msg Com Pro "+Msg)
               for(let i in PalProximo){
                   
                       if(Msg.includes(PalProximo[i])){
-                      
+                      console.log("entrou no proximo agora")
                           DigProximo  = true;
                       }
                   
@@ -2651,6 +2794,16 @@ var PagDinheiro = "";
                   }
 
                       }
+                  } else {
+                    // for(let i in DadoEmp.TaxasEntregas){
+                    //    var NomeTaxas = " "+DadoEmp.TaxasEntregas[i].Nome.toLowerCase()+" "
+                    //       //   console.log()
+                    //         if(Msg.includes(NomeTaxas)){
+                              
+                    //                 ValordaEntrega = DadoEmp.TaxasEntregas[i].Valor;
+                               
+                    //         }
+                    // }
                   }
                 
                   var DadosEnv = {
@@ -2677,6 +2830,7 @@ var PagDinheiro = "";
                    Desati ,
                    AnaliEnd,
                    Buscar,
+                   SessaoG,
                   }
     return DadosEnv;
     

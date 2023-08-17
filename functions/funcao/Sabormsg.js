@@ -54,7 +54,7 @@
 
   for(let i in GrupSessao){
   for(let j in GrupSessao[i].TagsTamanhos){
-      TagTModi =" "+GrupSessao[i].TagsTamanhos[j].toLowerCase()+" "
+      TagTModi =" "+GrupSessao[i].TagsTamanhos[j].trim().toLowerCase()+" "
       // console.log("Conb: "+DivNome4[j])
       // console.log("Sessao "+GrupSessao[i].body.toLowerCase())
       if(TagTModi !== "" && TagTModi !== " " && TagTModi !== "  "){
